@@ -10,6 +10,7 @@ import WarningRecovery from 'src/views/statistic/warningRecovery'
 import UnprintedProducts from 'src/views/statistic/unprintedProducts'
 import OEECompared from 'src/views/statistic/oeeCompared'
 import DowntimeDifference from 'src/views/statistic/downtimeDifference'
+import StatisticTableFilter from 'src/views/statistic/statisticTableFilter'
 
 
 const Statistic = () => {
@@ -37,6 +38,9 @@ const Statistic = () => {
           </Grid>
           <Grid item xs={12} lg={4}>
             <DowntimeDifference />
+          </Grid>
+          <Grid item xs={12} lg={12}>
+            <StatisticTableFilter />
           </Grid>
         </Grid>
       </KeenSliderWrapper>

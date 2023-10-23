@@ -1,7 +1,9 @@
+const apiurl = 'https://dev.iotaroundyou.my.id'
 export default {
-  meEndpoint: '/auth/me',
-  loginEndpoint: '/jwt/login',
+  meEndpoint: apiurl + '/api/user',
+  loginEndpoint: apiurl + '/api/auth/login',
   registerEndpoint: '/jwt/register',
-  storageTokenKeyName: 'accessToken',
-  onTokenExpiration: 'refreshToken' // logout | refreshToken
+  logoutEndpoint: apiurl + '/api/logout',
+  storageTokenKeyName: 'token'
+  //   onTokenExpiration: 'refreshToken' // logout | refreshToken
 }

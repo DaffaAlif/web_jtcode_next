@@ -6,33 +6,52 @@ const navigation = () => {
       icon: 'tabler:smart-home'
     },
     {
-      title: 'Alerts',
+      title: 'Statistic',
       path: '/alerts',
       icon: 'tabler:align-box-bottom-center'
     },
     {
-      title: 'Statistics',
+      title: 'Alerts',
       path: '/statistic',
-      icon: 'tabler:alert-square-rounded'
+      icon: 'tabler:alert-square-rounded',
+      children: [
+        {
+          title: 'Alert List',
+          path: '/statistic'
+        },
+        {
+          title: 'Alarm Add',
+          path: '/statistic/add'
+        },
+        {
+          title: 'Alarm Edit',
+          path: '/statistic/edit'
+        }
+      ]
     },
     {
-      title: 'Printers',
+      title: 'Users',
       icon: 'tabler:printer',
       children: [
         {
           title: 'Client',
-          path: '/printers-client'
+          path: '/clients'
         },
         {
           title: 'Customer',
-          path: '/printers-customer'
+          path: '/customer'
         },
         {
-          title: 'Site',
-          path: '/printers-site'
+          title: 'Sites',
+          path: '/sites'
+        },
+        {
+          title: 'Printers',
+          path: '/printers'
         }
       ]
     },
+
     {
       title: 'User Management',
       path: '/manage-users',

@@ -136,7 +136,7 @@ const columns = [
   }
 ]
 
-const PrintersTableFilter = () => {
+const StatisticTableFilter = () => {
   // ** States
   const [data] = useState(rows)
   const [searchText, setSearchText] = useState('')
@@ -164,7 +164,7 @@ const PrintersTableFilter = () => {
 
   return (
     <Card>
-      <CardHeader title='Printers' />
+      <CardHeader title='Alarms' />
       <CardActions sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
         <Button variant='outlined' onClick={toggleAddPaymentDrawer}>
           Add Data
@@ -200,4 +200,4 @@ const PrintersTableFilter = () => {
   )
 }
 
-export default PrintersTableFilter
+export default StatisticTableFilter

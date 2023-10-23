@@ -3,18 +3,17 @@ import ApexChartWrapper from 'src/@core/styles/libs/react-apexcharts'
 
 import Grid from '@mui/material/Grid'
 
-
-import PrintersTableFilter from 'src/views/printers/printersTableFilter'
-
+import ClientPrintersTableFilter from 'src/views/clients/clientPrintersTableFilter'
 
 
-const Printers = () => {
+
+const ClientPage = () => {
   return (
     <ApexChartWrapper>
       <KeenSliderWrapper>
         <Grid container spacing={6}>
           <Grid item xs={12}>
-            <PrintersTableFilter />
+            <ClientPrintersTableFilter />
           </Grid>
         </Grid>
       </KeenSliderWrapper>
@@ -22,4 +21,4 @@ const Printers = () => {
   )
 }
 
-export default Printers
+export default ClientPage
