@@ -6,6 +6,10 @@ const path = require('path')
 // Remove this if you're not using Fullcalendar features
 
 module.exports = {
+  output: 'export',
+  images: {
+    unoptimized: true
+  },
   trailingSlash: true,
   reactStrictMode: false,
   webpack: config => {
