@@ -25,34 +25,34 @@ module.exports = {
     'import/no-anonymous-default-export': 'off',
 
     // add new line above comment
-    'lines-around-comment': [
-      'error',
-      {
-        beforeLineComment: true,
-        beforeBlockComment: true,
-        allowBlockStart: true,
-        allowClassStart: true,
-        allowObjectStart: true,
-        allowArrayStart: true
-      }
-    ],
+    // 'lines-around-comment': [
+    //   'error',
+    //   {
+    //     beforeLineComment: true,
+    //     beforeBlockComment: true,
+    //     allowBlockStart: true,
+    //     allowClassStart: true,
+    //     allowObjectStart: true,
+    //     allowArrayStart: true
+    //   }
+    // ],
 
     // add new line above return
-    'newline-before-return': 'error',
+    // 'newline-before-return': 'error',
 
     // add new line below import
-    'import/newline-after-import': [
-      'error',
-      {
-        count: 1
-      }
-    ],
+    // 'import/newline-after-import': [
+    //   'error',
+    //   {
+    //     count: 1
+    //   }
+    // ],
 
     // add new line after each var, const, let declaration
-    'padding-line-between-statements': [
-      'error',
-      { blankLine: 'always', prev: ['export'], next: ['*'] },
-      { blankLine: 'always', prev: ['*'], next: ['multiline-const', 'multiline-let', 'multiline-var', 'export'] }
-    ]
+    // 'padding-line-between-statements': [
+    //   'error',
+    //   { blankLine: 'always', prev: ['export'], next: ['*'] },
+    //   { blankLine: 'always', prev: ['*'], next: ['multiline-const', 'multiline-let', 'multiline-var', 'export'] }
+    // ]
   }
 }

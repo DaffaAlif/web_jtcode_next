@@ -1,0 +1,35 @@
+on:
+  push:
+    branches:
+      - main
+name: 🚀 Deploy website on push
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v3
+
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node.version: '19.x'
+
+    - name: Install dependencies
+      run: yarn install
+    
+    - name: Build app
+      run: yarn next build
+
+    - name: Copy Files
+      run:  bash copyoutfile.sh
+
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: iotaroundyou.my.id
+        username: iotayou
+        local-dir : ./.next/
+        server-dir: public_html/
+        password: ${{ secrets.PASSWORD }}
