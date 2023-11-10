@@ -160,7 +160,11 @@ const FormEditCustomer = () => {
                   <em>None</em>
                 </MenuItem>
                 {dataParameter.map(dataParameter => {
-                  return <MenuItem value={dataParameter.parameter_id}>{dataParameter.name}</MenuItem>
+                  return (
+                    <MenuItem key={dataParameter.parameter_id} value={dataParameter.parameter_id}>
+                      {dataParameter.name}
+                    </MenuItem>
+                  )
                 })}
               </CustomTextField>
             </Grid>
@@ -179,7 +183,11 @@ const FormEditCustomer = () => {
                   <em>None</em>
                 </MenuItem>
                 {dataPrinters.map(dataPrinters => {
-                  return <MenuItem value={dataPrinters.printer_id}>{dataPrinters.name}</MenuItem>
+                  return (
+                    <MenuItem key={dataPrinters.printer_id} value={dataPrinters.printer_id}>
+                      {dataPrinters.name}
+                    </MenuItem>
+                  )
                 })}
               </CustomTextField>
             </Grid>

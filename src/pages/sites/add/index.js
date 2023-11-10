@@ -160,7 +160,11 @@ const FormLayoutsIcons = () => {
                   <em>None</em>
                 </MenuItem>
                 {data.map(data => {
-                  return <MenuItem value={data.user_id}>{data.full_name}</MenuItem>
+                  return (
+                    <MenuItem key={data.user_id} value={data.user_id}>
+                      {data.full_name}
+                    </MenuItem>
+                  )
                 })}
               </CustomTextField>
             </Grid>

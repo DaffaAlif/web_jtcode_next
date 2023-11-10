@@ -178,7 +178,11 @@ const FormLayoutsIcons = () => {
                   <em>None</em>
                 </MenuItem>
                 {dataSite.map(dataSite => {
-                  return <MenuItem value={dataSite.site_id}>{dataSite.name}</MenuItem>
+                  return (
+                    <MenuItem key={dataSite.site_id} value={dataSite.site_id}>
+                      {dataSite.name}
+                    </MenuItem>
+                  )
                 })}
               </CustomTextField>
             </Grid>
@@ -197,7 +201,11 @@ const FormLayoutsIcons = () => {
                   <em>None</em>
                 </MenuItem>
                 {dataInstrument.map(dataInstrument => {
-                  return <MenuItem value={dataInstrument.instrument_id}>{dataInstrument.name}</MenuItem>
+                  return (
+                    <MenuItem key={dataInstrument.instrument_id} value={dataInstrument.instrument_id}>
+                      {dataInstrument.name}
+                    </MenuItem>
+                  )
                 })}
               </CustomTextField>
             </Grid>
