@@ -11,7 +11,7 @@ const navigation = () => {
       icon: 'tabler:align-box-bottom-center'
     },
     {
-      title: 'Alerts',
+      title: 'Alerts Log',
       path: '/statistic',
       icon: 'tabler:alert-square-rounded',
       children: [
@@ -30,7 +30,7 @@ const navigation = () => {
       ]
     },
     {
-      title: 'Users',
+      title: 'Assets',
       icon: 'tabler:printer',
       children: [
         {
@@ -48,8 +48,26 @@ const navigation = () => {
         {
           title: 'Printers',
           path: '/printers'
+        },
+        {
+          title: 'Alarm Set',
+          path: '/alarmset'
         }
       ]
+    },
+
+    {
+      title: 'Devices',
+      icon: 'tabler:printer',
+      children: [
+        {
+          title: 'Instrument',
+          path: '/instrument'
+        },
+        {
+          title: 'Parameter',
+          path: '/parameter'
+        },]
     },
 
     {

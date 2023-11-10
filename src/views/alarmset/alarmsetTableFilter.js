@@ -18,6 +18,7 @@ import Cookies from 'universal-cookie'
 // ** Config
 import authConfig from 'src/configs/auth'
 
+
 import { useEffect } from 'react'
 import axios from 'axios'
 
@@ -32,24 +33,8 @@ import Icon from 'src/@core/components/icon'
 import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
 
-import QuickSearchToolbar from 'src/views/table/data-grid/QuickSearchToolbar'
 
-// ** Utils Import
-import { getInitials } from 'src/@core/utils/get-initials'
-
-const statusObj = {
-  1: { title: 'current', color: 'primary' },
-  2: { title: 'professional', color: 'success' },
-  3: { title: 'rejected', color: 'error' },
-  4: { title: 'resigned', color: 'warning' },
-  5: { title: 'applied', color: 'info' }
-}
-
-const escapeRegExp = value => {
-  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
-}
-
-const PrintersPrintersTableFilter = () => {
+const AlarmSetTableFilter = () => {
   // ** States
   const [message, setMessage] = useState('')
   const [data, setData] = useState([])
@@ -58,8 +43,6 @@ const PrintersPrintersTableFilter = () => {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
 
   console.log(message)
-
-  const router = useRouter()
 
   //SnackBar
   const [open, setOpen] = useState(false)
@@ -87,23 +70,14 @@ const PrintersPrintersTableFilter = () => {
     setMessageInfo(undefined)
   }
 
+  const router = useRouter()
+
   const columns = [
     {
       flex: 0.2,
       minWidth: 110,
-      field: 'code',
-      headerName: 'PRINTER CODE',
-      renderCell: ({ row }) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {row.code}
-        </Typography>
-      )
-    },
-    {
-      flex: 0.2,
-      minWidth: 110,
       field: 'name',
-      headerName: 'PRINTER NAME',
+      headerName: 'name',
       renderCell: ({ row }) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {row.name}
@@ -113,8 +87,30 @@ const PrintersPrintersTableFilter = () => {
     {
       flex: 0.2,
       minWidth: 110,
+      field: 'condition',
+      headerName: 'condition',
+      renderCell: ({ row }) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {row.condition}
+        </Typography>
+      )
+    },
+    {
+      flex: 0.2,
+      minWidth: 110,
+      field: 'notes',
+      headerName: 'notes',
+      renderCell: ({ row }) => (
+        <Typography variant='body2' sx={{ color: 'text.primary' }}>
+          {row.notes}
+        </Typography>
+      )
+    },
+    {
+      flex: 0.2,
+      minWidth: 110,
       field: 'status',
-      headerName: 'PRINTER STATUS',
+      headerName: 'status',
       align: 'center',
       renderCell: ({ row }) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
@@ -122,17 +118,7 @@ const PrintersPrintersTableFilter = () => {
         </Typography>
       )
     },
-    {
-      flex: 0.2,
-      minWidth: 110,
-      field: 'PRINTER NOTES',
-      headerName: 'PRINTER NOTES',
-      renderCell: ({ row }) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {row.notes}
-        </Typography>
-      )
-    },
+
     {
       flex: 0.2,
       minWidth: 140,
@@ -144,7 +130,7 @@ const PrintersPrintersTableFilter = () => {
             <IconButton aria-label='edit' size='small'>
               <Icon align='center' fontSize='1 rem' icon='tabler:ballpen' onClick={() => handleEdit(row)} />
             </IconButton>
-            <IconButton aria-label='delete' size='small' onClick={() => handleDelete(row.printer_id)}>
+            <IconButton aria-label='delete' size='small' onClick={() => handleDelete(row.instrument_id)}>
               <Icon align='center' fontSize='1 rem' icon='tabler:trash' color='red' />
             </IconButton>
           </Box>
@@ -157,14 +143,13 @@ const PrintersPrintersTableFilter = () => {
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
-      .get('https://dev.iotaroundyou.my.id/api/user/devicelist', {
+      .get('https://dev.iotaroundyou.my.id/api/alarms', {
         headers: {
           Authorization: 'Bearer ' + storedToken
         }
       })
       .then(response => {
         setData(response.data.data)
-        console.log(response.data.data)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
@@ -172,7 +157,7 @@ const PrintersPrintersTableFilter = () => {
   }, [message])
 
   const handleEdit = row => {
-    const editUrl = `/printers/edit?printer_id=${row.printer_id}&code=${row.code}&name=${row.name}&status=${row.status}&notes=${row.notes}`
+    const editUrl = `/alarmset/edit?alarm_id=${row.alarm_id}&printer_id=${row.printer_id}&parameter_id=${row.parameter_id}&name=${row.name}&condition=${row.condition}&notes=${row.notes}&status=${row.status}`
     router.push(editUrl)
   }
 
@@ -185,8 +170,8 @@ const PrintersPrintersTableFilter = () => {
     }
     axios
       .post(
-        `https://dev.iotaroundyou.my.id/api/printer/delete`,
-        { printer_id: idToDelete },
+        `https://dev.iotaroundyou.my.id/api/alarm/delete`,
+        { alarm_id: idToDelete },
         {
           headers: {
             Authorization: 'Bearer ' + storedToken
@@ -195,28 +180,28 @@ const PrintersPrintersTableFilter = () => {
       )
       .then(response => {
         setMessage(`Data with ID  deleted successfully.`)
-         const message = 'success'
-         setSnackPack(prev => [...prev, { message, key: new Date().getTime() }])
+        const message = 'success'
+        setSnackPack(prev => [...prev, { message, key: new Date().getTime() }])
       })
       .catch(error => {
         setMessage(`An error occurred while deleting data with ID.`)
-         const message = 'error'
-         setSnackPack(prev => [...prev, { message, key: new Date().getTime() }])
+        const message = 'error'
+        setSnackPack(prev => [...prev, { message, key: new Date().getTime() }])
         console.error(error)
       })
   }
 
   function getRowId(data) {
-    return data.printer_id
+    return data.alarm_id
   }
 
   console.log(data)
 
   return data ? (
     <Card>
-      <CardHeader title='Printers' />
+      <CardHeader title='Alarm Set' />
       <CardActions sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
-        <Button variant='outlined' component={Link} href={'/printers/add'}>
+        <Button variant='outlined' component={Link} href={'/alarmset/add'}>
           Add Data
         </Button>
       </CardActions>
@@ -256,4 +241,4 @@ const PrintersPrintersTableFilter = () => {
   ) : null
 }
 
-export default PrintersPrintersTableFilter
+export default AlarmSetTableFilter

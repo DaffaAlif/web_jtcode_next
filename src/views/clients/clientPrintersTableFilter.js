@@ -67,17 +67,6 @@ const ClientPrintersTableFilter = () => {
     {
       flex: 0.2,
       minWidth: 110,
-      field: 'id',
-      headerName: 'CLIENT ID',
-      renderCell: ({ row }) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {row.user_id}
-        </Typography>
-      )
-    },
-    {
-      flex: 0.2,
-      minWidth: 110,
       field: 'code',
       headerName: 'client code',
       renderCell: ({ row }) => (

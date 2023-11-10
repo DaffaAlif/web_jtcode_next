@@ -7,11 +7,15 @@ import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
 import { DataGrid } from '@mui/x-data-grid'
-import { Button } from '@mui/material'
 import CardActions from '@mui/material/CardActions'
 import IconButton from '@mui/material/IconButton'
-import CustomChip from 'src/@core/components/mui/chip'
-import FormEditCustomer from 'src/pages/customer/edit'
+
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContentText from '@mui/material/DialogContentText'
 
 import Cookies from 'universal-cookie'
 
@@ -32,34 +36,16 @@ import Icon from 'src/@core/components/icon'
 import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
 
-import QuickSearchToolbar from 'src/views/table/data-grid/QuickSearchToolbar'
-
-// ** Utils Import
-import { getInitials } from 'src/@core/utils/get-initials'
-
-const statusObj = {
-  1: { title: 'current', color: 'primary' },
-  2: { title: 'professional', color: 'success' },
-  3: { title: 'rejected', color: 'error' },
-  4: { title: 'resigned', color: 'warning' },
-  5: { title: 'applied', color: 'info' }
-}
-
-const escapeRegExp = value => {
-  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
-}
-
-const PrintersPrintersTableFilter = () => {
+const ManageUsersTable = () => {
   // ** States
   const [message, setMessage] = useState('')
+  const [dataCustomers, setDataCustomers] = useState([])
+  const [dataClients, setDataClients] = useState([])
   const [data, setData] = useState([])
-  const [searchText, setSearchText] = useState('')
-  const [filteredData, setFilteredData] = useState([])
+  const [selectedData, setSelectedData] = useState([])
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
 
-  console.log(message)
-
-  const router = useRouter()
+  console.log(data)
 
   //SnackBar
   const [open, setOpen] = useState(false)
@@ -83,56 +69,44 @@ const PrintersPrintersTableFilter = () => {
     setOpen(false)
   }
 
+  const [openDialog, setOpenDialog] = useState(false)
+  const handleClickOpen = (data) => {
+    setOpenDialog(true)
+    setSelectedData(data)
+  }
+  const handleDialogClose = () => setOpenDialog(false)
+
   const handleExited = () => {
     setMessageInfo(undefined)
   }
+
+  const router = useRouter()
 
   const columns = [
     {
       flex: 0.2,
       minWidth: 110,
-      field: 'code',
-      headerName: 'PRINTER CODE',
-      renderCell: ({ row }) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {row.code}
-        </Typography>
-      )
-    },
-    {
-      flex: 0.2,
-      minWidth: 110,
       field: 'name',
-      headerName: 'PRINTER NAME',
+      headerName: 'name',
       renderCell: ({ row }) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {row.name}
+          {row.full_name}
         </Typography>
       )
     },
     {
       flex: 0.2,
       minWidth: 110,
-      field: 'status',
-      headerName: 'PRINTER STATUS',
-      align: 'center',
-      renderCell: ({ row }) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {row.status}
-        </Typography>
-      )
-    },
-    {
-      flex: 0.2,
-      minWidth: 110,
-      field: 'PRINTER NOTES',
-      headerName: 'PRINTER NOTES',
+      field: 'notes',
+      headerName: 'notes',
       renderCell: ({ row }) => (
         <Typography variant='body2' sx={{ color: 'text.primary' }}>
           {row.notes}
         </Typography>
       )
     },
+  
+
     {
       flex: 0.2,
       minWidth: 140,
@@ -141,10 +115,7 @@ const PrintersPrintersTableFilter = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <IconButton aria-label='edit' size='small'>
-              <Icon align='center' fontSize='1 rem' icon='tabler:ballpen' onClick={() => handleEdit(row)} />
-            </IconButton>
-            <IconButton aria-label='delete' size='small' onClick={() => handleDelete(row.printer_id)}>
+            <IconButton aria-label='delete' size='small' onClick={() => handleClickOpen(row)}>
               <Icon align='center' fontSize='1 rem' icon='tabler:trash' color='red' />
             </IconButton>
           </Box>
@@ -157,24 +128,39 @@ const PrintersPrintersTableFilter = () => {
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
-      .get('https://dev.iotaroundyou.my.id/api/user/devicelist', {
+      .get('https://dev.iotaroundyou.my.id/api/customers', {
         headers: {
           Authorization: 'Bearer ' + storedToken
         }
       })
       .then(response => {
-        setData(response.data.data)
-        console.log(response.data.data)
+        setDataClients(response.data.data)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
   }, [message])
 
-  const handleEdit = row => {
-    const editUrl = `/printers/edit?printer_id=${row.printer_id}&code=${row.code}&name=${row.name}&status=${row.status}&notes=${row.notes}`
-    router.push(editUrl)
-  }
+   useEffect(() => {
+     const cookies = new Cookies()
+     const storedToken = cookies.get(authConfig.storageTokenKeyName)
+     axios
+       .get('https://dev.iotaroundyou.my.id/api/clients', {
+         headers: {
+           Authorization: 'Bearer ' + storedToken
+         }
+       })
+       .then(response => {
+         setDataCustomers(response.data.data)
+       })
+       .catch(error => {
+         console.error('Error fetching data:', error)
+       })
+   }, [message])
+  
+  useEffect(() => {
+    setData(dataCustomers.concat(dataClients)) 
+  }, [dataCustomers, dataClients])
 
   const handleDelete = idToDelete => {
     const cookies = new Cookies()
@@ -185,8 +171,8 @@ const PrintersPrintersTableFilter = () => {
     }
     axios
       .post(
-        `https://dev.iotaroundyou.my.id/api/printer/delete`,
-        { printer_id: idToDelete },
+        `https://dev.iotaroundyou.my.id/api/user/delete`,
+        { alarm_id: idToDelete },
         {
           headers: {
             Authorization: 'Bearer ' + storedToken
@@ -195,28 +181,26 @@ const PrintersPrintersTableFilter = () => {
       )
       .then(response => {
         setMessage(`Data with ID  deleted successfully.`)
-         const message = 'success'
-         setSnackPack(prev => [...prev, { message, key: new Date().getTime() }])
+        const message = 'success'
+        setSnackPack(prev => [...prev, { message, key: new Date().getTime() }])
       })
       .catch(error => {
         setMessage(`An error occurred while deleting data with ID.`)
-         const message = 'error'
-         setSnackPack(prev => [...prev, { message, key: new Date().getTime() }])
+        const message = 'error'
+        setSnackPack(prev => [...prev, { message, key: new Date().getTime() }])
         console.error(error)
       })
   }
 
   function getRowId(data) {
-    return data.printer_id
+    return data.user_id
   }
-
-  console.log(data)
 
   return data ? (
     <Card>
-      <CardHeader title='Printers' />
+      <CardHeader title='Alarm Set' />
       <CardActions sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
-        <Button variant='outlined' component={Link} href={'/printers/add'}>
+        <Button variant='outlined' component={Link} href={'/alarmset/add'}>
           Add Data
         </Button>
       </CardActions>
@@ -252,8 +236,25 @@ const PrintersPrintersTableFilter = () => {
           {message}
         </Alert>
       </Snackbar>
+      {/* <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>WARNING!</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='alert-dialog-description'>
+            Anda akan menghapus data ini! Yakin akan melanjutkan?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions className='dialog-actions-dense'>
+          <Button onClick={handleDialogClose}>tidak</Button>
+          <Button onClick={handleDelete(selectedData.user_id)}>yakin</Button>
+        </DialogActions>
+      </Dialog> */}
     </Card>
   ) : null
 }
 
-export default PrintersPrintersTableFilter
+export default ManageUsersTable

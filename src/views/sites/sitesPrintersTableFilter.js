@@ -90,17 +90,7 @@ const SitesPrintersTableFilter = () => {
   const router = useRouter()
 
   const columns = [
-    {
-      flex: 0.2,
-      minWidth: 110,
-      field: 'id',
-      headerName: 'ID',
-      renderCell: ({ row }) => (
-        <Typography variant='body2' sx={{ color: 'text.primary' }}>
-          {row.site_id}
-        </Typography>
-      )
-    },
+    
     {
       flex: 0.2,
       minWidth: 110,

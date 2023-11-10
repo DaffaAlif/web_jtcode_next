@@ -3,17 +3,18 @@ import ApexChartWrapper from 'src/@core/styles/libs/react-apexcharts'
 
 import Grid from '@mui/material/Grid'
 
-import UserManagementTableFilter from 'src/views/manage-users/printersTableFilter'
+
+import ManageUsersTable from 'src/views/manage-users/manageUsersTable'
 
 
 
-const UserManage = () => {
+const Printers = () => {
   return (
     <ApexChartWrapper>
       <KeenSliderWrapper>
         <Grid container spacing={6}>
           <Grid item xs={12}>
-            <UserManagementTableFilter />
+            <ManageUsersTable />
           </Grid>
         </Grid>
       </KeenSliderWrapper>
@@ -21,4 +22,4 @@ const UserManage = () => {
   )
 }
 
-export default UserManage
+export default Printers
