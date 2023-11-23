@@ -14,20 +14,6 @@ const navigation = () => {
       title: 'Alerts Log',
       path: '/statistic',
       icon: 'tabler:alert-square-rounded',
-      children: [
-        {
-          title: 'Alert List',
-          path: '/statistic'
-        },
-        {
-          title: 'Alarm Add',
-          path: '/statistic/add'
-        },
-        {
-          title: 'Alarm Edit',
-          path: '/statistic/edit'
-        }
-      ]
     },
     {
       title: 'Assets',
@@ -39,54 +25,54 @@ const navigation = () => {
         },
         {
           title: 'Customer',
-          path: '/customer'
+          path: '/customer-page'
         },
         {
-          title: 'Sites',
+          title: 'Site',
           path: '/sites'
         },
         {
-          title: 'Printers',
+          title: 'Printer',
           path: '/printers'
         },
         {
-          title: 'Alarm Set',
+          title: 'Alarm',
           path: '/alarmset'
         }
       ]
     },
-
     {
       title: 'Devices',
       icon: 'tabler:printer',
       children: [
         {
           title: 'Instrument',
-          path: '/instrument'
+          path: '/instruments'
         },
         {
           title: 'Parameter',
-          path: '/parameter'
+          path: '/parameters'
         },]
     },
 
     {
       title: 'User Management',
-      path: '/manage-users',
-      icon: 'tabler:user-cog'
+      icon: 'tabler:user-cog',
+      children: [
+        {
+          title: 'Users',
+          path: '/users'
+        },
+        {
+          title: 'User Groups',
+          path: '/user-groups'
+        },]
     },
     {
       title: 'User Log',
       path: '/user-log',
       icon: 'tabler:album'
     },
-    {
-      path: '/acl',
-      action: 'read',
-      subject: 'acl-page',
-      title: 'Access Control',
-      icon: 'tabler:shield'
-    }
   ]
 }
 

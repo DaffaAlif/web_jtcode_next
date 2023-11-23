@@ -2,10 +2,6 @@
 import Head from 'next/head'
 import { Router } from 'next/router'
 
-
-
-
-
 // ** Loader Import
 import NProgress from 'nprogress'
 

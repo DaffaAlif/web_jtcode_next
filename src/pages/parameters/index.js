@@ -11,12 +11,12 @@ import authConfig from 'src/configs/auth'
 import { useEffect, useState } from 'react'
 
 //Component
-import AlarmsetTable from 'src/views/alarmset/alarmsetTable'
-import FormLayoutsEditAlarmset from 'src/views/alarmset/edit-form/alarmsetEditForm'
+import ParameterTable from 'src/views/parameters/parameterTable'
+import FormLayoutsEditParameter from 'src/views/parameters/edit-form/parameterEditForm'
 import DialogConfirmationDelete from 'src/views/delete-confirmation/deleteConfirmation'
 import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
 
-const AlarmsetPage = () => {
+const CustomerPage = () => {
   //check permission
   const [userDataPermission, setUserDataPermission] = useState('')
   useEffect(() => {
@@ -31,7 +31,7 @@ const AlarmsetPage = () => {
       .then(response => {
         const userPermission = response.data.role.role_permissions
         const filteredPermission = Object.keys(userPermission).filter(keys => {
-          return userPermission[keys].name == 'Alarm'
+          return userPermission[keys].name == 'Client'
         })
         setUserDataPermission(userPermission[filteredPermission].pivot.role_permission)
       })
@@ -42,43 +42,7 @@ const AlarmsetPage = () => {
 
   //fetch data
   const [message, setMessage] = useState('')
-  //Alarms data
-  const [dataAlarms, setDataAlarms] = useState([])
-  useEffect(() => {
-    const cookies = new Cookies()
-    const storedToken = cookies.get(authConfig.storageTokenKeyName)
-    axios
-      .get('https://dev.iotaroundyou.my.id/api/alarms', {
-        headers: {
-          Authorization: 'Bearer ' + storedToken
-        }
-      })
-      .then(response => {
-        setDataAlarms(response.data.data)
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error)
-      })
-  }, [message])
-  // Printers data
-  const [dataPrinters, setDataPrinters] = useState([])
-  useEffect(() => {
-    const cookies = new Cookies()
-    const storedToken = cookies.get(authConfig.storageTokenKeyName)
-    axios
-      .get('https://dev.iotaroundyou.my.id/api/user/devicelist', {
-        headers: {
-          Authorization: 'Bearer ' + storedToken
-        }
-      })
-      .then(response => {
-        setDataPrinters(response.data.data)
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error)
-      })
-  }, [message])
-  //Parameter data
+  //customers data
   const [dataParameters, setDataParameters] = useState([])
   useEffect(() => {
     const cookies = new Cookies()
@@ -95,15 +59,30 @@ const AlarmsetPage = () => {
       .catch(error => {
         console.error('Error fetching data:', error)
       })
+    }, [message])
+  // clients data
+  const [dataInstruments, setDataInstruments] = useState([])
+  useEffect(() => {
+    const cookies = new Cookies()
+    const storedToken = cookies.get(authConfig.storageTokenKeyName)
+    axios
+      .get('https://dev.iotaroundyou.my.id/api/instruments', {
+        headers: {
+          Authorization: 'Bearer ' + storedToken
+        }
+      })
+      .then(response => {
+        setDataInstruments(response.data.data)
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error)
+      })
   }, [message])
-
-
 
   //take data from selected row
   const [selectedData, setSelectedData] = useState({
-    parameter_id: 'selectedData.parameter_id',
-    printer_id: 'selectedData.printer_id',
-    alarm_id: 'selectedData.alarm_id',
+    role_id: 'selectedData.role_id',
+    parent_id: 'selectedData.parent_id',
     code: 'selectedData.code',
     full_name: 'selectedData.name',
     address: 'selectedData.address',
@@ -124,14 +103,14 @@ const AlarmsetPage = () => {
   const handleDelete = () => {
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
-    if (!selectedData.alarm_id) {
+    if (!selectedData.role_id) {
       setMessage('Please enter an ID to delete.')
       return
     }
     axios
       .post(
-        `https://dev.iotaroundyou.my.id/api/alarm/delete`,
-        { alarm_id: selectedData.alarm_id },
+        `https://dev.iotaroundyou.my.id/api/parameter/delete`,
+        { role_id: selectedData.role_id },
         {
           headers: {
             Authorization: 'Bearer ' + storedToken
@@ -156,7 +135,7 @@ const AlarmsetPage = () => {
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     console.log(selectedData)
     axios
-      .post(`https://dev.iotaroundyou.my.id/api/alarm/update`, selectedData, {
+      .post(`https://dev.iotaroundyou.my.id/api/parameter/update`, selectedData, {
         headers: {
           Authorization: 'Bearer ' + storedToken
         }
@@ -193,21 +172,21 @@ const AlarmsetPage = () => {
     }
     setOpenSnackbarAlert(false)
   }
-  const handleError = errors => {
-    const error = []
-    Object.keys(errors).map(keys => {
-      error.push(errors[keys])
-    })
-    setOpenSnackbarAlert(true)
-    setError(true)
-    const allErrors = error.join('\n')
-    setMessage(allErrors)
-  }
-  const handleSuccess = response => {
-    setError(false)
-    setOpenSnackbarAlert(true)
-    setMessage(response.data.message)
-  }
+   const handleError = errors => {
+     const error = []
+     Object.keys(errors).map(keys => {
+       error.push(errors[keys])
+     })
+     setOpenSnackbarAlert(true)
+     setError(true)
+     const allErrors = error.join('\n')
+     setMessage(allErrors)
+   }
+   const handleSuccess = response => {
+     setError(false)
+     setOpenSnackbarAlert(true)
+     setMessage(response.data.message)
+   }
 
   return (
     <>
@@ -215,17 +194,20 @@ const AlarmsetPage = () => {
         <KeenSliderWrapper>
           <Grid container spacing={6}>
             <Grid item xs={12}>
-              <AlarmsetTable permission={userDataPermission} selectData={handleSelectedData} tableData={dataAlarms} />
+              <ParameterTable
+                permission={userDataPermission}
+                selectData={handleSelectedData}
+                tableData={dataParameters}
+              />
             </Grid>
           </Grid>
         </KeenSliderWrapper>
       </ApexChartWrapper>
-      <FormLayoutsEditAlarmset
+      <FormLayoutsEditParameter
         open={openEditDialog}
         handleClose={handleCloseEditDialog}
         selectedData={selectedData}
-        dataPrinters={dataPrinters}
-        dataParameters={dataParameters}
+        dataInstruments={dataInstruments}
         handleFormChange={handleEditFormChange}
         handleEdit={handleEdit}
       />
@@ -239,4 +221,4 @@ const AlarmsetPage = () => {
   )
 }
 
-export default AlarmsetPage
+export default CustomerPage

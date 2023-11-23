@@ -52,14 +52,14 @@ const FormLayoutsIcons = () => {
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
-      .post('https://dev.iotaroundyou.my.id/api/role/create', formData, {
+      .post('https://dev.iotaroundyou.my.id/api/instrument/create', formData, {
         headers: {
           Authorization: 'Bearer ' + storedToken
         }
       })
       .then(response => {
         handleSuccess(response)
-        router.push('/clients')
+        router.push('/instruments')
       })
       .catch(error => {
         handleError(error.response.data.errors)
@@ -125,25 +125,6 @@ const FormLayoutsIcons = () => {
                     startAdornment: (
                       <InputAdornment position='start'>
                         <Icon fontSize='1.25rem' icon='tabler:hash' />
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <CustomTextField
-                  fullWidth
-                  multiline
-                  minRows={3}
-                  label='Address'
-                  name='address'
-                  value={formData.address}
-                  onChange={handleFormChange}
-                  sx={{ '& .MuiInputBase-root.MuiFilledInput-root': { alignItems: 'baseline' } }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position='start'>
-                        <Icon fontSize='1.25rem' icon='tabler:home' />
                       </InputAdornment>
                     )
                   }}

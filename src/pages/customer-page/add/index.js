@@ -8,7 +8,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import MenuItem from '@mui/material/MenuItem'
 import { Select } from '@mui/material'
 import InputLabel from '@mui/material/InputLabel'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 
 import { useRouter } from 'next/router'
@@ -28,12 +28,14 @@ import Icon from 'src/@core/components/icon'
 import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
 
 const initialState = {
+  code: '',
   name: '',
   address: '',
   notes: '',
+  parent_id: '',
   status: 6,
   user_type: 2,
-  role_type: 2
+  role_type: 3
 }
 
 const FormLayoutsIcons = () => {
@@ -47,6 +49,25 @@ const FormLayoutsIcons = () => {
     setFormData({ ...formData, [name]: value })
   }
 
+  // clients data
+  const [dataClients, setDataClients] = useState([])
+  useEffect(() => {
+    const cookies = new Cookies()
+    const storedToken = cookies.get(authConfig.storageTokenKeyName)
+    axios
+      .get('https://dev.iotaroundyou.my.id/api/clients', {
+        headers: {
+          Authorization: 'Bearer ' + storedToken
+        }
+      })
+      .then(response => {
+        setDataClients(response.data.data)
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error)
+      })
+  }, [])
+
   const handleSubmit = e => {
     e.preventDefault()
     const cookies = new Cookies()
@@ -59,7 +80,7 @@ const FormLayoutsIcons = () => {
       })
       .then(response => {
         handleSuccess(response)
-        router.push('/clients')
+        router.push('/customer-page')
       })
       .catch(error => {
         handleError(error.response.data.errors)
@@ -129,6 +150,24 @@ const FormLayoutsIcons = () => {
                     )
                   }}
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <InputLabel id='demo-simple-select-label'>Client</InputLabel>
+                <Select
+                  fullWidth
+                  name='parent_id'
+                  value={formData.parent_id}
+                  onChange={handleFormChange}
+                  startAdornment={
+                    <InputAdornment position='start'>
+                      <Icon fontSize='1.25rem' icon='tabler:user' />
+                    </InputAdornment>
+                  }
+                >
+                  {dataClients.map(dataClients => {
+                    return <MenuItem value={dataClients.role_id}>{dataClients.name}</MenuItem>
+                  })}
+                </Select>
               </Grid>
               <Grid item xs={12}>
                 <CustomTextField

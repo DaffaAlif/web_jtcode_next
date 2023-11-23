@@ -6,6 +6,8 @@ import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 import InputAdornment from '@mui/material/InputAdornment'
 import MenuItem from '@mui/material/MenuItem'
+import { Select } from '@mui/material'
+import InputLabel from '@mui/material/InputLabel'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
@@ -22,59 +24,50 @@ import CustomTextField from 'src/@core/components/mui/text-field'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
-// ** SNACKBAR
-import Alert from '@mui/material/Alert'
-import Snackbar from '@mui/material/Snackbar'
+//component from view
+import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
 
 const initialState = {
   code: '',
-  customer_id: '',
   name: '',
-  location: '',
   address: '',
+  location: '',
+  notes: '',
+  customer_id: '',
   status: 6,
-  notes: ''
+  user_type: 2,
+  role_type: 3
 }
 
 const FormLayoutsIcons = () => {
   const [formData, setFormData] = useState(initialState)
-  const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(false)
-  const [data, setData] = useState([])
+  const [message, setMessage] = useState('')
 
   const router = useRouter()
 
   const handleFormChange = e => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
-    console.log(formData)
   }
 
-  //SnackBar
-  const [open, setOpen] = useState(false)
-  const [snackPack, setSnackPack] = useState([])
-  const [messageInfo, setMessageInfo] = useState(undefined)
-
+  // customers data
+  const [dataCustomers, setDataCustomers] = useState([])
   useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      setOpen(true)
-      setSnackPack(prev => prev.slice(1))
-      setMessageInfo({ ...snackPack[0] })
-    } else if (snackPack.length && messageInfo && open) {
-      setOpen(false)
-    }
-  }, [snackPack, messageInfo, open])
-
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return
-    }
-    setOpen(false)
-  }
-
-  const handleExited = () => {
-    setMessageInfo(undefined)
-  }
+    const cookies = new Cookies()
+    const storedToken = cookies.get(authConfig.storageTokenKeyName)
+    axios
+      .get('https://dev.iotaroundyou.my.id/api/customers', {
+        headers: {
+          Authorization: 'Bearer ' + storedToken
+        }
+      })
+      .then(response => {
+        setDataCustomers(response.data.data)
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error)
+      })
+  }, [])
 
   const handleSubmit = e => {
     e.preventDefault()
@@ -87,188 +80,179 @@ const FormLayoutsIcons = () => {
         }
       })
       .then(response => {
-        setSuccess(true)
-        setError('Data Insertion Success! Redirecting you')
-        setFormData(initialState)
-        const message = 'success'
-        setSnackPack(prev => [...prev, { message, key: new Date().getTime() }])
-        router.replace('/sites')
+        handleSuccess(response)
+        router.push('/sites')
       })
       .catch(error => {
-        setSuccess(false)
-        setError('An error occurred while submitting the form. Please try again.')
-        const message = 'error'
-        setSnackPack(prev => [...prev, { message, key: new Date().getTime() }])
-        console.error(error)
+        handleError(error.response.data.errors)
       })
   }
 
-  
-
-   useEffect(() => {
-     const cookies = new Cookies()
-     const storedToken = cookies.get(authConfig.storageTokenKeyName)
-     axios
-       .get('https://dev.iotaroundyou.my.id/api/customers', {
-         headers: {
-           Authorization: 'Bearer ' + storedToken
-         }
-       })
-       .then(response => {
-         setData(response.data.data)
-       })
-       .catch(error => {
-         console.error('Error fetching data:', error)
-       })
-   }, [])
+  //snackbar
+  const [openSnackbarAlert, setOpenSnackbarAlert] = useState(false)
+  const [error, setError] = useState(false)
+  const handleSnackbarAlertClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return
+    }
+    setOpenSnackbarAlert(false)
+  }
+  const handleError = errors => {
+    const error = []
+    Object.keys(errors).map(keys => {
+      error.push(errors[keys])
+    })
+    setOpenSnackbarAlert(true)
+    setError(true)
+    const allErrors = error.join('\n')
+    setMessage(allErrors)
+  }
+  const handleSuccess = response => {
+    setError(false)
+    setOpenSnackbarAlert(true)
+    setMessage(response.data.message)
+  }
 
   return (
-    <Card>
-      <CardHeader title='Add' />
-      <CardContent>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={5}>
-            <Grid item xs={12}>
-              <CustomTextField
-                fullWidth
-                label='Code'
-                name='code'
-                value={formData.code}
-                onChange={handleFormChange}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position='start'>
-                      <Icon fontSize='1.25rem' icon='tabler:hash' />
-                    </InputAdornment>
-                  )
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <CustomTextField
-                fullWidth
-                name='customer_id'
-                value={formData.customer_id}
-                onChange={handleFormChange}
-                select
-                defaultValue=''
-                label='Customer ID'
-                id='customer_id'
-              >
-                <MenuItem value=''>
-                  <em>None</em>
-                </MenuItem>
-                {data.map(data => {
-                  return (
-                    <MenuItem key={data.user_id} value={data.user_id}>
-                      {data.full_name}
-                    </MenuItem>
-                  )
-                })}
-              </CustomTextField>
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                fullWidth
-                label='Name'
-                name='name'
-                value={formData.name}
-                onChange={handleFormChange}
-                InputProps={{
-                  startAdornment: (
+    <>
+      <Card>
+        <CardHeader title='Add' />
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={5}>
+              <Grid item xs={12}>
+                <CustomTextField
+                  fullWidth
+                  label='Code'
+                  name='code'
+                  value={formData.code}
+                  onChange={handleFormChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <Icon fontSize='1.25rem' icon='tabler:hash' />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextField
+                  fullWidth
+                  name='name'
+                  label='Name'
+                  value={formData.name}
+                  onChange={handleFormChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <Icon fontSize='1.25rem' icon='tabler:hash' />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <InputLabel id='demo-simple-select-label'>Customer</InputLabel>
+                <Select
+                  fullWidth
+                  name='customer_id'
+                  value={formData.customer_id}
+                  onChange={handleFormChange}
+                  startAdornment={
                     <InputAdornment position='start'>
                       <Icon fontSize='1.25rem' icon='tabler:user' />
                     </InputAdornment>
-                  )
-                }}
-              />
-            </Grid>
+                  }
+                >
+                  {dataCustomers.map(dataCustomers => {
+                    return <MenuItem value={dataCustomers.role_id}>{dataCustomers.name}</MenuItem>
+                  })}
+                </Select>
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextField
+                  fullWidth
+                  multiline
+                  minRows={3}
+                  label='Address'
+                  name='address'
+                  value={formData.address}
+                  onChange={handleFormChange}
+                  sx={{ '& .MuiInputBase-root.MuiFilledInput-root': { alignItems: 'baseline' } }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <Icon fontSize='1.25rem' icon='tabler:home' />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextField
+                  fullWidth
+                  name='location'
+                  label='Location'
+                  value={formData.location}
+                  onChange={handleFormChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <Icon fontSize='1.25rem' icon='tabler:home' />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <InputLabel id='demo-simple-select-label'>Status</InputLabel>
+                <Select
+                  fullWidth
+                  name='status'
+                  value={formData.status}
+                  onChange={handleFormChange}
+                  startAdornment={
+                    <InputAdornment position='start'>
+                      <Icon fontSize='1.25rem' icon='tabler:user' />
+                    </InputAdornment>
+                  }
+                >
+                  <MenuItem value={6}>Active</MenuItem>
+                  <MenuItem value={7}>Non Active</MenuItem>
+                </Select>
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextField
+                  fullWidth
+                  multiline
+                  minRows={3}
+                  label='Notes'
+                  name='notes'
+                  value={formData.notes}
+                  onChange={handleFormChange}
+                  sx={{ '& .MuiInputBase-root.MuiFilledInput-root': { alignItems: 'baseline' } }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <Icon fontSize='1.25rem' icon='tabler:user' />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
 
-            <Grid item xs={12}>
-              <CustomTextField
-                fullWidth
-                multiline
-                minRows={3}
-                label=' Sites Address'
-                name='address'
-                value={formData.address}
-                onChange={handleFormChange}
-                placeholder='Sites Address'
-                sx={{ '& .MuiInputBase-root.MuiFilledInput-root': { alignItems: 'baseline' } }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position='start'>
-                      <Icon fontSize='1.25rem' icon='tabler:home' />
-                    </InputAdornment>
-                  )
-                }}
-              />
+              <Grid item xs={12}>
+                <Button type='submit' variant='contained'>
+                  Submit
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                fullWidth
-                label='Location'
-                name='location'
-                value={formData.location}
-                onChange={handleFormChange}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position='start'>
-                      <Icon fontSize='1.25rem' icon='tabler:home' />
-                    </InputAdornment>
-                  )
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextField
-                fullWidth
-                multiline
-                minRows={3}
-                label=' Notes'
-                name='notes'
-                value={formData.notes}
-                onChange={handleFormChange}
-                placeholder='Notes'
-                sx={{ '& .MuiInputBase-root.MuiFilledInput-root': { alignItems: 'baseline' } }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position='start'>
-                      <Icon fontSize='1.25rem' icon='tabler:ballpen' />
-                    </InputAdornment>
-                  )
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Button type='submit' variant='contained'>
-                Submit
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </CardContent>
-      <Snackbar
-        open={open}
-        onClose={handleClose}
-        autoHideDuration={3000}
-        TransitionProps={{ onExited: handleExited }}
-        key={messageInfo ? messageInfo.key : undefined}
-        message={messageInfo ? messageInfo.message : undefined}
-      >
-        <Alert
-          elevation={3}
-          variant='filled'
-          onClose={handleClose}
-          sx={{ width: '100%' }}
-          severity={messageInfo?.message === 'success' ? 'success' : 'error'}
-        >
-          {error}
-        </Alert>
-      </Snackbar>
-    </Card>
+          </form>
+        </CardContent>
+      </Card>
+      <SnackbarAlert open={openSnackbarAlert} message={message} handleClose={handleSnackbarAlertClose} error={error} />
+    </>
   )
 }
 

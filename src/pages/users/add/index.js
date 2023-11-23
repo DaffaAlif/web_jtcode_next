@@ -5,10 +5,11 @@ import Button from '@mui/material/Button'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 import InputAdornment from '@mui/material/InputAdornment'
+import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import { Select } from '@mui/material'
 import InputLabel from '@mui/material/InputLabel'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 
 import { useRouter } from 'next/router'
@@ -29,8 +30,9 @@ import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
 
 const initialState = {
   name: '',
-  address: '',
-  notes: '',
+  username: '',
+  password: '',
+  email: '',
   status: 6,
   user_type: 2,
   role_type: 2
@@ -39,6 +41,7 @@ const initialState = {
 const FormLayoutsIcons = () => {
   const [formData, setFormData] = useState(initialState)
   const [message, setMessage] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const router = useRouter()
 
@@ -52,19 +55,54 @@ const FormLayoutsIcons = () => {
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
-      .post('https://dev.iotaroundyou.my.id/api/role/create', formData, {
+      .post('https://dev.iotaroundyou.my.id/api/user/create', formData, {
         headers: {
           Authorization: 'Bearer ' + storedToken
         }
       })
       .then(response => {
         handleSuccess(response)
-        router.push('/clients')
+        router.push('/users')
       })
       .catch(error => {
         handleError(error.response.data.errors)
       })
   }
+  const [dataClients, setDataClients] = useState([])
+  useEffect(() => {
+    const cookies = new Cookies()
+    const storedToken = cookies.get(authConfig.storageTokenKeyName)
+    axios
+      .get('https://dev.iotaroundyou.my.id/api/clients', {
+        headers: {
+          Authorization: 'Bearer ' + storedToken
+        }
+      })
+      .then(response => {
+        setDataClients(response.data.data)
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error)
+      })
+  }, [message])
+  //customers data
+  const [dataCustomers, setDataCustomers] = useState([])
+  useEffect(() => {
+    const cookies = new Cookies()
+    const storedToken = cookies.get(authConfig.storageTokenKeyName)
+    axios
+      .get('https://dev.iotaroundyou.my.id/api/customers', {
+        headers: {
+          Authorization: 'Bearer ' + storedToken
+        }
+      })
+      .then(response => {
+        setDataCustomers(response.data.data)
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error)
+      })
+  }, [message])
 
   //snackbar
   const [openSnackbarAlert, setOpenSnackbarAlert] = useState(false)
@@ -101,9 +139,25 @@ const FormLayoutsIcons = () => {
               <Grid item xs={12}>
                 <CustomTextField
                   fullWidth
-                  label='Code'
-                  name='code'
-                  value={formData.code}
+                  label='Username'
+                  name='username'
+                  value={formData.username}
+                  onChange={handleFormChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <Icon fontSize='1.25rem' icon='tabler:hash' />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextField
+                  fullWidth
+                  name='email'
+                  label='Email'
+                  value={formData.email}
                   onChange={handleFormChange}
                   InputProps={{
                     startAdornment: (
@@ -133,28 +187,32 @@ const FormLayoutsIcons = () => {
               <Grid item xs={12}>
                 <CustomTextField
                   fullWidth
-                  multiline
-                  minRows={3}
-                  label='Address'
-                  name='address'
-                  value={formData.address}
+                  name='password'
+                  label='Password'
+                  value={formData.password}
                   onChange={handleFormChange}
-                  sx={{ '& .MuiInputBase-root.MuiFilledInput-root': { alignItems: 'baseline' } }}
+                  type={showPassword ? 'text' : 'password'}
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position='start'>
-                        <Icon fontSize='1.25rem' icon='tabler:home' />
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton
+                          edge='end'
+                          onMouseDown={e => e.preventDefault()}
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          <Icon fontSize='1.25rem' icon={showPassword ? 'tabler:eye' : 'tabler:eye-off'} />
+                        </IconButton>
                       </InputAdornment>
                     )
                   }}
                 />
               </Grid>
               <Grid item xs={12}>
-                <InputLabel id='demo-simple-select-label'>Status</InputLabel>
+                <InputLabel id='demo-simple-select-label'>Role</InputLabel>
                 <Select
                   fullWidth
-                  name='status'
-                  value={formData.status}
+                  name='role'
+                  value={formData.role}
                   onChange={handleFormChange}
                   startAdornment={
                     <InputAdornment position='start'>
@@ -162,10 +220,49 @@ const FormLayoutsIcons = () => {
                     </InputAdornment>
                   }
                 >
-                  <MenuItem value={6}>Active</MenuItem>
-                  <MenuItem value={7}>Non Active</MenuItem>
+                  <MenuItem value={2}>Client</MenuItem>
+                  <MenuItem value={1}>Customer</MenuItem>
                 </Select>
               </Grid>
+              {formData.role == 1 ? (
+                <Grid item xs={12}>
+                  <InputLabel id='demo-simple-select-label'>Customer</InputLabel>
+                  <Select
+                    fullWidth
+                    name='user_role_id'
+                    value={formData.user_role_id}
+                    onChange={handleFormChange}
+                    startAdornment={
+                      <InputAdornment position='start'>
+                        <Icon fontSize='1.25rem' icon='tabler:user' />
+                      </InputAdornment>
+                    }
+                  >
+                    {dataCustomers.map(dataCustomers => {
+                      return <MenuItem value={dataCustomers.role_id}>{dataCustomers.name}</MenuItem>
+                    })}
+                  </Select>
+                </Grid>
+              ) : formData.role == 2 ? (
+                <Grid item xs={12}>
+                  <InputLabel id='demo-simple-select-label'>Client</InputLabel>
+                  <Select
+                    fullWidth
+                    name='user_role_id'
+                    value={formData.user_role_id}
+                    onChange={handleFormChange}
+                    startAdornment={
+                      <InputAdornment position='start'>
+                        <Icon fontSize='1.25rem' icon='tabler:user' />
+                      </InputAdornment>
+                    }
+                  >
+                    {dataClients.map(dataClients => {
+                      return <MenuItem value={dataClients.role_id}>{dataClients.name}</MenuItem>
+                    })}
+                  </Select>
+                </Grid>
+              ) : null}
               <Grid item xs={12}>
                 <CustomTextField
                   fullWidth

@@ -14,9 +14,11 @@ import DashboardTableBasic from 'src/views/dashboard/dashboardTableBasic'
 
 
 
-const Dashboard = () => {
+const Dashboard = ({ hidden }) => {
+  console.log(hidden)
     return (
       <ApexChartWrapper>
+        
         <KeenSliderWrapper>
           <Grid container spacing={6}>
             <Grid item xs={12}>
