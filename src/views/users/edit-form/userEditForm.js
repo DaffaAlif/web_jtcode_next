@@ -129,7 +129,11 @@ const FormLayoutsEditUser = ({ handleClose, open, selectedData, dataClients, dat
                       }
                     >
                       {dataCustomers.map(dataCustomers => {
-                        return <MenuItem value={dataCustomers.role_id}>{dataCustomers.name}</MenuItem>
+                        return (
+                          <MenuItem key={dataCustomers.role_id} value={dataCustomers.role_id}>
+                            {dataCustomers.name}
+                          </MenuItem>
+                        )
                       })}
                     </Select>
                   </Grid>
@@ -148,7 +152,11 @@ const FormLayoutsEditUser = ({ handleClose, open, selectedData, dataClients, dat
                       }
                     >
                       {dataClients.map(dataClients => {
-                        return <MenuItem value={dataClients.role_id}>{dataClients.name}</MenuItem>
+                        return (
+                          <MenuItem key={dataClients.role_id} value={dataClients.role_id}>
+                            {dataClients.name}
+                          </MenuItem>
+                        )
                       })}
                     </Select>
                   </Grid>

@@ -77,7 +77,11 @@ const FormLayoutsEditPrinter = ({ handleClose, open, selectedData, dataSites, da
                     }
                   >
                     {dataSites.map(dataSites => {
-                      return <MenuItem value={dataSites.site_id}>{dataSites.name}</MenuItem>
+                      return (
+                        <MenuItem key={dataSites.site_id} value={dataSites.site_id}>
+                          {dataSites.name}
+                        </MenuItem>
+                      )
                     })}
                   </Select>
                 </Grid>
@@ -95,7 +99,11 @@ const FormLayoutsEditPrinter = ({ handleClose, open, selectedData, dataSites, da
                     }
                   >
                     {dataInstruments.map(dataInstruments => {
-                      return <MenuItem value={dataInstruments.instrument_id}>{dataInstruments.name}</MenuItem>
+                      return (
+                        <MenuItem key={dataInstruments.instrument_id} value={dataInstruments.instrument_id}>
+                          {dataInstruments.name}
+                        </MenuItem>
+                      )
                     })}
                   </Select>
                 </Grid>

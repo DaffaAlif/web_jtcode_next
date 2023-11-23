@@ -182,7 +182,11 @@ const FormLayoutsIcons = () => {
                   }
                 >
                   {dataPrinters.map(dataPrinters => {
-                    return <MenuItem value={dataPrinters.printer_id}>{dataPrinters.name}</MenuItem>
+                    return (
+                      <MenuItem key={dataPrinters.printer_id} value={dataPrinters.printer_id}>
+                        {dataPrinters.name}
+                      </MenuItem>
+                    )
                   })}
                 </Select>
               </Grid>
@@ -200,7 +204,11 @@ const FormLayoutsIcons = () => {
                   }
                 >
                   {dataParameters.map(dataParameters => {
-                    return <MenuItem value={dataParameters.parameter_id}>{dataParameters.name}</MenuItem>
+                    return (
+                      <MenuItem key={dataParameters.parameter_id} value={dataParameters.parameter_id}>
+                        {dataParameters.name}
+                      </MenuItem>
+                    )
                   })}
                 </Select>
               </Grid>
