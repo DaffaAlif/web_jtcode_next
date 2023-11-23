@@ -78,7 +78,11 @@ const FormLayoutsEditParameter = ({ handleClose, open, selectedData, dataInstrum
                     }
                   >
                     {dataInstruments.map(dataInstruments => {
-                      return <MenuItem value={dataInstruments.instrument_id}>{dataInstruments.name}</MenuItem>
+                      return (
+                        <MenuItem key={dataInstruments.instrument_id} value={dataInstruments.instrument_id}>
+                          {dataInstruments.name}
+                        </MenuItem>
+                      )
                     })}
                   </Select>
                 </Grid>

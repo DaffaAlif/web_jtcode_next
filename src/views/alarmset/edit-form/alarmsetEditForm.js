@@ -77,7 +77,11 @@ const FormLayoutsEditAlarmset = ({ handleClose, open, selectedData, dataPrinters
                     }
                   >
                     {dataPrinters.map(dataPrinters => {
-                      return <MenuItem value={dataPrinters.printer_id}>{dataPrinters.name}</MenuItem>
+                      return (
+                        <MenuItem key={dataPrinters.printer_id} value={dataPrinters.printer_id}>
+                          {dataPrinters.name}
+                        </MenuItem>
+                      )
                     })}
                   </Select>
                 </Grid>
@@ -95,7 +99,11 @@ const FormLayoutsEditAlarmset = ({ handleClose, open, selectedData, dataPrinters
                     }
                   >
                     {dataParameters.map(dataParameters => {
-                      return <MenuItem value={dataParameters.parameter_id}>{dataParameters.name}</MenuItem>
+                      return (
+                        <MenuItem key={dataParameters.parameter_id} value={dataParameters.parameter_id}>
+                          {dataParameters.name}
+                        </MenuItem>
+                      )
                     })}
                   </Select>
                 </Grid>

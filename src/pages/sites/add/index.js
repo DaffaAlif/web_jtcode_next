@@ -166,7 +166,11 @@ const FormLayoutsIcons = () => {
                   }
                 >
                   {dataCustomers.map(dataCustomers => {
-                    return <MenuItem value={dataCustomers.role_id}>{dataCustomers.name}</MenuItem>
+                    return (
+                      <MenuItem key={dataCustomers.role_id} value={dataCustomers.role_id}>
+                        {dataCustomers.name}
+                      </MenuItem>
+                    )
                   })}
                 </Select>
               </Grid>
