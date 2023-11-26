@@ -29,11 +29,11 @@ const SitePage = () => {
         }
       })
       .then(response => {
-        const userPermission = response.data.role.role_permissions
+        const userPermission = response.data.user_permissions
         const filteredPermission = Object.keys(userPermission).filter(keys => {
           return userPermission[keys].name == 'Printer'
         })
-        setUserDataPermission(userPermission[filteredPermission].pivot.role_permission)
+        setUserDataPermission(userPermission[filteredPermission].pivot.user_permission)
       })
       .catch(error => {
         console.error('Error fetching data:', error)

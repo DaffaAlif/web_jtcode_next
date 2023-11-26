@@ -60,7 +60,8 @@ const UserLayout = ({ children, contentHeightFixed }) => {
       })
       .then(response => {
         const userPermission = []
-        response.data.role.role_permissions.map(data => {
+        console.log(response.data)
+        response.data.user_permissions.map(data => {
           userPermission.push(data)
         })
         setUserDataPermission(userPermission)
@@ -76,20 +77,18 @@ const UserLayout = ({ children, contentHeightFixed }) => {
     const filter = Array.isArray(userDataPermission)
       ? userDataPermission.find(userDataPermission => userDataPermission.name === navbarItem.title)
       : null
-    return filter?.pivot?.role_permission[0] === 'v'
+    return filter?.pivot?.user_permission[0] === 'v'
   })
 
-  
   const NavbarItemsFiltered = filteredNavbar => {
     if (filteredNavbar.length < 5) {
       items[3].children = filteredNavbar
       delete items[4]
       return items
     } else {
-      return items  
-    } 
+      return items
+    }
   }
-
 
   return (
     <Layout

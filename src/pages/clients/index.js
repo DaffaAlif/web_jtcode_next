@@ -29,17 +29,16 @@ const ClientPage = () => {
         }
       })
       .then(response => {
-        const userPermission = response.data.role.role_permissions
+        const userPermission = response.data.user_permissions
         const filteredPermission = Object.keys(userPermission).filter(keys => {
           return userPermission[keys].name == 'Site'
         })
-        setUserDataPermission(userPermission[filteredPermission].pivot.role_permission)
+        setUserDataPermission(userPermission[filteredPermission].pivot.user_permission)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
   }, [])
-
 
   //fetch data
   const [message, setMessage] = useState('')
@@ -153,17 +152,17 @@ const ClientPage = () => {
     }
     setOpenSnackbarAlert(false)
   }
-  const handleError = (errors) => {
-     const error = []
-     Object.keys(errors).map(keys => {
-       error.push(errors[keys])
-     })
-     setOpenSnackbarAlert(true)
-     setError(true)
-     const allErrors = error.join('\n')
-     setMessage(allErrors)
+  const handleError = errors => {
+    const error = []
+    Object.keys(errors).map(keys => {
+      error.push(errors[keys])
+    })
+    setOpenSnackbarAlert(true)
+    setError(true)
+    const allErrors = error.join('\n')
+    setMessage(allErrors)
   }
-  const handleSuccess = (response) => {
+  const handleSuccess = response => {
     setError(false)
     setOpenSnackbarAlert(true)
     setMessage(response.data.message)
