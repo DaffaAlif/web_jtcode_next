@@ -64,8 +64,8 @@ const navigation = () => {
           path: '/users'
         },
         {
-          title: 'User Groups',
-          path: '/user-groups'
+          title: 'User Group',
+          path: '/user-group'
         },]
     },
     {
