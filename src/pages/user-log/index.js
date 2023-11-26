@@ -11,15 +11,7 @@ import authConfig from 'src/configs/auth'
 
 import { useEffect, useState } from 'react'
 
-import StatisticContentHeader from 'src/views/alerts/statisticContentHeader'
-import TotalActiveAlerts from 'src/views/alerts/totalActiveAlerts'
-import FaultRecovery from 'src/views/alerts/faultRecovery'
-import WarningRecovery from 'src/views/alerts/warningRecovery'
-import UnprintedProducts from 'src/views/alerts/unprintedProducts'
-import OEECompared from 'src/views/alerts/oeeCompared'
-import DowntimeDifference from 'src/views/alerts/downtimeDifference'
-import AlertTable from 'src/views/alerts/alertTable'
-
+import UserLogTable from 'src/views/user-log/UserLogTable'
 
 const AlertsPage = () => {
 
@@ -52,7 +44,7 @@ const AlertsPage = () => {
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
-      .get('https://dev.iotaroundyou.my.id/api/alerts', {
+      .get('https://dev.iotaroundyou.my.id/api/user/logs', {
         headers: {
           Authorization: 'Bearer ' + storedToken
         }
@@ -69,31 +61,9 @@ const AlertsPage = () => {
     <ApexChartWrapper>
       <KeenSliderWrapper>
         <Grid container spacing={6}>
-          <Grid item xs={12}>
-            <StatisticContentHeader />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <TotalActiveAlerts />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <FaultRecovery />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <WarningRecovery />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <UnprintedProducts />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <OEECompared />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <DowntimeDifference />
-          </Grid>
           <Grid item xs={12} lg={12}>
-            <AlertTable 
+            <UserLogTable 
               permission={userDataPermission} tableData={data}
-            
             />
           </Grid>
         </Grid>

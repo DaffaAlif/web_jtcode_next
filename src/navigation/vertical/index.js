@@ -7,12 +7,12 @@ const navigation = () => {
     },
     {
       title: 'Statistic',
-      path: '/alerts',
+      path: '/statistics',
       icon: 'tabler:align-box-bottom-center'
     },
     {
       title: 'Alerts Log',
-      path: '/statistic',
+      path: '/alerts',
       icon: 'tabler:alert-square-rounded',
     },
     {
