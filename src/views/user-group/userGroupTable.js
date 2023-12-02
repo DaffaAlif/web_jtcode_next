@@ -19,8 +19,6 @@ import { useRouter } from 'next/router'
 import Icon from 'src/@core/components/icon'
 
 const UserGroupTable = ({ permission, tableData, selectData }) => {
-  console.log(tableData)
-  console.log(permission)
   // ** States
   const router = useRouter()
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
@@ -109,11 +107,11 @@ const UserGroupTable = ({ permission, tableData, selectData }) => {
   return tableData ? (
     <Card>
       <CardHeader title='User Group' />
-      <CardActions sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+      {/* <CardActions sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
         <Button disabled={permission.includes('a') ? false : true} variant='outlined' onClick={() => router.push('/clients/add')}>
           Add Data
         </Button>
-      </CardActions>
+      </CardActions> */}
       <DataGrid
         getRowId={getRowId}
         autoHeight

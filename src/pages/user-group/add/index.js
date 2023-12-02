@@ -59,7 +59,7 @@ const FormLayoutsIcons = () => {
       })
       .then(response => {
         handleSuccess(response)
-        router.push('/user-group')
+        router.push('/user-group?add_success=true')
       })
       .catch(error => {
         handleError(error.response.data.errors)

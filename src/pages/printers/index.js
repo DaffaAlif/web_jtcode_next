@@ -10,13 +10,36 @@ import authConfig from 'src/configs/auth'
 
 import { useEffect, useState } from 'react'
 
+import { useRouter } from 'next/router'
+
+
 //Component
 import PrinterTable from 'src/views/printers/printerTable'
 import FormLayoutsEditPrinter from 'src/views/printers/edit-form/printerEditForm'
 import DialogConfirmationDelete from 'src/views/delete-confirmation/deleteConfirmation'
 import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
+import Loaders from 'src/views/loaders/loaders'
 
 const SitePage = () => {
+  const [fetchData, setFetchData] = useState()
+  //message state
+  const [message, setMessage] = useState('')
+  //loading state
+  const [loading, setLoading] = useState(false)
+  //check success add data
+  const router = useRouter()
+  const { add_success } = router.query
+ 
+  useEffect(() => {
+    console.log(add_success)
+    if (add_success){
+      setError(false)
+      setOpenSnackbarAlert(true)
+      setMessage('data berhasil ditambahkan')
+    }else{
+      console.log(add_success)
+    }
+  }, [])
   //check permission
   const [userDataPermission, setUserDataPermission] = useState('')
   useEffect(() => {
@@ -41,10 +64,10 @@ const SitePage = () => {
   }, [])
 
   //fetch data
-  const [message, setMessage] = useState('')
   // Printers data
   const [dataPrinters, setDataPrinters] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -54,12 +77,13 @@ const SitePage = () => {
         }
       })
       .then(response => {
+        setLoading(false)
         setDataPrinters(response.data.data)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
+  }, [fetchData])
   //sites data
   const [dataSites, setDataSites] = useState([])
   useEffect(() => {
@@ -77,7 +101,7 @@ const SitePage = () => {
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
+  }, [fetchData])
   //instruments data
   const [dataInstruments, setDataInstruments] = useState([])
   useEffect(() => {
@@ -95,10 +119,8 @@ const SitePage = () => {
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
+  }, [fetchData])
 
-  console.log(dataPrinters)
-  console.log(dataSites)
 
   //take data from selected row
   const [selectedData, setSelectedData] = useState({
@@ -122,6 +144,7 @@ const SitePage = () => {
 
   //delete data
   const handleDelete = () => {
+    setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     if (!selectedData.printer_id) {
@@ -139,6 +162,7 @@ const SitePage = () => {
         }
       )
       .then(response => {
+        setFetchData(false)
         setMessage(`Data with ID  deleted successfully.`)
         handleCloseDeleteConfirmation()
         setOpenSnackbarAlert(true)
@@ -152,6 +176,7 @@ const SitePage = () => {
 
   //edit data
   const handleEdit = () => {
+    setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     console.log(selectedData)
@@ -162,6 +187,7 @@ const SitePage = () => {
         }
       })
       .then(response => {
+        setFetchData(false)
         handleCloseEditDialog()
         handleSuccess(response)
       })
@@ -209,7 +235,7 @@ const SitePage = () => {
     setMessage(response.data.message)
   }
 
-  return (
+  return loading == false ?  (
     <>
       <ApexChartWrapper>
         <KeenSliderWrapper>
@@ -236,7 +262,7 @@ const SitePage = () => {
       />
       <SnackbarAlert open={openSnackbarAlert} message={message} error={error} handleClose={handleSnackbarAlertClose} />
     </>
-  )
+  ) : <Loaders/>
 }
 
 export default SitePage

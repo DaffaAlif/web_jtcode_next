@@ -16,13 +16,11 @@ import AlertsContentHeader from 'src/views/statistics/alertsContentHeader'
 import PrintRates from 'src/views/statistics/printRates'
 import PrintProgress from 'src/views/statistics/printProgress'
 import TimeBetweenAlerts from 'src/views/statistics/timeBetweenAlerts'
+import Loaders from 'src/views/loaders/loaders'
+
 
 const StatisticsPage = () => {
 
-
-
-
-  
   return (
     <ApexChartWrapper>
       <KeenSliderWrapper>

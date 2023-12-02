@@ -10,13 +10,36 @@ import authConfig from 'src/configs/auth'
 
 import { useEffect, useState } from 'react'
 
+import { useRouter } from 'next/router'
+
 //Component
 import AlarmsetTable from 'src/views/alarmset/alarmsetTable'
 import FormLayoutsEditAlarmset from 'src/views/alarmset/edit-form/alarmsetEditForm'
 import DialogConfirmationDelete from 'src/views/delete-confirmation/deleteConfirmation'
 import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
+import Loaders from 'src/views/loaders/loaders'
 
 const AlarmsetPage = () => {
+  const [fetchData, setFetchData] = useState()
+  //loading state
+  const [loading, setLoading] = useState(false)
+  
+  //message state
+  const [message, setMessage] = useState('')
+
+  //check success add data
+  const router = useRouter()
+  const { add_success } = router.query
+  useEffect(() => {
+    if (add_success){
+      setError(false)
+      setOpenSnackbarAlert(true)
+      setMessage('data berhasil ditambahkan')
+    }else{
+      null
+    }
+  }, [])
+
   //check permission
   const [userDataPermission, setUserDataPermission] = useState('')
   useEffect(() => {
@@ -31,7 +54,7 @@ const AlarmsetPage = () => {
       .then(response => {
         const userPermission = response.data.user_permissions
         const filteredPermission = Object.keys(userPermission).filter(keys => {
-          return userPermission[keys].name == 'Alarm'
+          return userPermission[keys].name == 'Printer'
         })
         setUserDataPermission(userPermission[filteredPermission].pivot.user_permission)
       })
@@ -40,11 +63,11 @@ const AlarmsetPage = () => {
       })
   }, [])
 
-  //fetch data
-  const [message, setMessage] = useState('')
+  
   //Alarms data
   const [dataAlarms, setDataAlarms] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -55,14 +78,16 @@ const AlarmsetPage = () => {
       })
       .then(response => {
         setDataAlarms(response.data.data)
+        setLoading(false)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
+  }, [fetchData])
   // Printers data
   const [dataPrinters, setDataPrinters] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -73,14 +98,16 @@ const AlarmsetPage = () => {
       })
       .then(response => {
         setDataPrinters(response.data.data)
+        setLoading(false)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
+  }, [fetchData])
   //Parameter data
   const [dataParameters, setDataParameters] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -91,11 +118,12 @@ const AlarmsetPage = () => {
       })
       .then(response => {
         setDataParameters(response.data.data)
+        setLoading(false)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
+  }, [fetchData])
 
   //take data from selected row
   const [selectedData, setSelectedData] = useState({
@@ -120,6 +148,7 @@ const AlarmsetPage = () => {
 
   //delete data
   const handleDelete = () => {
+    setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     if (!selectedData.alarm_id) {
@@ -137,7 +166,7 @@ const AlarmsetPage = () => {
         }
       )
       .then(response => {
-        setMessage(`Data with ID  deleted successfully.`)
+        setFetchData(false)
         handleCloseDeleteConfirmation()
         setOpenSnackbarAlert(true)
         setMessage(response.data.message)
@@ -150,6 +179,7 @@ const AlarmsetPage = () => {
 
   //edit data
   const handleEdit = () => {
+    setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     console.log(selectedData)
@@ -160,6 +190,7 @@ const AlarmsetPage = () => {
         }
       })
       .then(response => {
+        setFetchData(false)
         handleCloseEditDialog()
         handleSuccess(response)
       })
@@ -207,7 +238,7 @@ const AlarmsetPage = () => {
     setMessage(response.data.message)
   }
 
-  return (
+  return loading == false ? (
     <>
       <ApexChartWrapper>
         <KeenSliderWrapper>
@@ -234,7 +265,9 @@ const AlarmsetPage = () => {
       />
       <SnackbarAlert open={openSnackbarAlert} message={message} error={error} handleClose={handleSnackbarAlertClose} />
     </>
-  )
+  ) : <>
+    <Loaders/>
+  </>
 }
 
 export default AlarmsetPage

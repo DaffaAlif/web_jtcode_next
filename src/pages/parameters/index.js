@@ -10,13 +10,37 @@ import authConfig from 'src/configs/auth'
 
 import { useEffect, useState } from 'react'
 
+import { useRouter } from 'next/router'
+
 //Component
 import ParameterTable from 'src/views/parameters/parameterTable'
 import FormLayoutsEditParameter from 'src/views/parameters/edit-form/parameterEditForm'
 import DialogConfirmationDelete from 'src/views/delete-confirmation/deleteConfirmation'
 import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
+import Loaders from 'src/views/loaders/loaders'
 
 const CustomerPage = () => {
+  const [fetchData, setFetchData] = useState()
+  //loading state
+  const [loading, setLoading] = useState(false)
+  //message state
+  const [message, setMessage] = useState('')
+
+  //check success add data
+  const router = useRouter()
+  const { add_success } = router.query
+ 
+  useEffect(() => {
+    console.log(add_success)
+    if (add_success){
+      setError(false)
+      setOpenSnackbarAlert(true)
+      setMessage('data berhasil ditambahkan')
+    }else{
+      console.log(add_success)
+    }
+  }, [])
+
   //check permission
   const [userDataPermission, setUserDataPermission] = useState('')
   useEffect(() => {
@@ -31,7 +55,7 @@ const CustomerPage = () => {
       .then(response => {
         const userPermission = response.data.user_permissions
         const filteredPermission = Object.keys(userPermission).filter(keys => {
-          return userPermission[keys].name == 'Client'
+          return userPermission[keys].name == 'Printer'
         })
         setUserDataPermission(userPermission[filteredPermission].pivot.user_permission)
       })
@@ -41,10 +65,10 @@ const CustomerPage = () => {
   }, [])
 
   //fetch data
-  const [message, setMessage] = useState('')
   //customers data
   const [dataParameters, setDataParameters] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -54,15 +78,17 @@ const CustomerPage = () => {
         }
       })
       .then(response => {
+        setLoading(false)
         setDataParameters(response.data.data)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
+  }, [fetchData])
   // clients data
   const [dataInstruments, setDataInstruments] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -72,12 +98,13 @@ const CustomerPage = () => {
         }
       })
       .then(response => {
+        setLoading(false)
         setDataInstruments(response.data.data)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
+  }, [fetchData])
 
   //take data from selected row
   const [selectedData, setSelectedData] = useState({
@@ -101,6 +128,7 @@ const CustomerPage = () => {
 
   //delete data
   const handleDelete = () => {
+    setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     if (!selectedData.role_id) {
@@ -118,6 +146,7 @@ const CustomerPage = () => {
         }
       )
       .then(response => {
+        setFetchData(false)
         setMessage(`Data with ID  deleted successfully.`)
         handleCloseDeleteConfirmation()
         setOpenSnackbarAlert(true)
@@ -131,6 +160,7 @@ const CustomerPage = () => {
 
   //edit data
   const handleEdit = () => {
+    setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     console.log(selectedData)
@@ -141,6 +171,7 @@ const CustomerPage = () => {
         }
       })
       .then(response => {
+        setFetchData(false)
         handleCloseEditDialog()
         handleSuccess(response)
       })
@@ -188,7 +219,7 @@ const CustomerPage = () => {
     setMessage(response.data.message)
   }
 
-  return (
+  return loading == false ?  (
     <>
       <ApexChartWrapper>
         <KeenSliderWrapper>
@@ -218,7 +249,7 @@ const CustomerPage = () => {
       />
       <SnackbarAlert open={openSnackbarAlert} message={message} error={error} handleClose={handleSnackbarAlertClose} />
     </>
-  )
+  ) : <Loaders/>
 }
 
 export default CustomerPage

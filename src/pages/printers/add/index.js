@@ -98,7 +98,7 @@ const FormLayoutsIcons = () => {
       })
       .then(response => {
         handleSuccess(response)
-        router.push('/printers')
+        router.push('/printers?add_success=true')
       })
       .catch(error => {
         handleError(error.response.data.errors)

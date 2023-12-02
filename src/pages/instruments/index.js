@@ -10,13 +10,38 @@ import authConfig from 'src/configs/auth'
 
 import { useEffect, useState } from 'react'
 
+import { useRouter } from 'next/router'
+
+
 //Component
 import InstrumentTable from 'src/views/instrument/instrumentTable'
 import FormLayoutsEditInstrument from 'src/views/instrument/edit-form/instrumentEditForm'
 import DialogConfirmationDelete from 'src/views/delete-confirmation/deleteConfirmation'
 import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
+import Loaders from 'src/views/loaders/loaders'
 
 const InstrumentPage = () => {
+  const [fetchData, setFetchData] = useState(false)
+  //loading state
+  const [loading, setLoading] = useState(false)
+  //message state
+  const [message, setMessage] = useState('')
+
+  //check success add data
+  const router = useRouter()
+  const { add_success } = router.query
+ 
+  useEffect(() => {
+    console.log(add_success)
+    if (add_success){
+      setError(false)
+      setOpenSnackbarAlert(true)
+      setMessage('data berhasil ditambahkan')
+    }else{
+      console.log(add_success)
+    }
+  }, [])
+
   //check permission
   const [userDataPermission, setUserDataPermission] = useState('')
   useEffect(() => {
@@ -31,7 +56,7 @@ const InstrumentPage = () => {
       .then(response => {
         const userPermission = response.data.user_permissions
         const filteredPermission = Object.keys(userPermission).filter(keys => {
-          return userPermission[keys].name == 'Site'
+          return userPermission[keys].name == 'Printer'
         })
         setUserDataPermission(userPermission[filteredPermission].pivot.user_permission)
       })
@@ -41,9 +66,9 @@ const InstrumentPage = () => {
   }, [])
 
   //fetch data
-  const [message, setMessage] = useState('')
   const [data, setData] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -53,13 +78,14 @@ const InstrumentPage = () => {
         }
       })
       .then(response => {
+        setLoading(false)
         setData(response.data.data)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
-  console.log(data)
+  }, [fetchData])
+
 
   //take data from selected row
   const [selectedData, setSelectedData] = useState({
@@ -82,6 +108,7 @@ const InstrumentPage = () => {
 
   //delete data
   const handleDelete = () => {
+    setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     if (!selectedData.role_id) {
@@ -99,6 +126,7 @@ const InstrumentPage = () => {
         }
       )
       .then(response => {
+        setFetchData(false)
         setMessage(`Data with ID  deleted successfully.`)
         handleCloseDeleteConfirmation()
         setOpenSnackbarAlert(true)
@@ -112,6 +140,7 @@ const InstrumentPage = () => {
 
   //edit data
   const handleEdit = () => {
+    setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     console.log(selectedData)
@@ -122,6 +151,7 @@ const InstrumentPage = () => {
         }
       })
       .then(response => {
+        setFetchData(false)
         handleCloseEditDialog()
         handleSuccess(response)
       })
@@ -168,7 +198,7 @@ const InstrumentPage = () => {
     setMessage(response.data.message)
   }
 
-  return (
+  return loading == false ?  (
     <>
       <ApexChartWrapper>
         <KeenSliderWrapper>
@@ -193,7 +223,7 @@ const InstrumentPage = () => {
       />
       <SnackbarAlert open={openSnackbarAlert} message={message} handleClose={handleSnackbarAlertClose} error={error} />
     </>
-  )
+  ) : <Loaders/>
 }
 
 export default InstrumentPage

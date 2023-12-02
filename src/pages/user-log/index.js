@@ -12,8 +12,12 @@ import authConfig from 'src/configs/auth'
 import { useEffect, useState } from 'react'
 
 import UserLogTable from 'src/views/user-log/UserLogTable'
+import Loaders from 'src/views/loaders/loaders'
+
 
 const AlertsPage = () => {
+  //loading state
+  const [loading, setLoading] = useState(false)
 
   const [userDataPermission, setUserDataPermission] = useState('')
   useEffect(() => {
@@ -41,6 +45,8 @@ const AlertsPage = () => {
   const [message, setMessage] = useState('')
   const [data, setData] = useState([])
   useEffect(() => {
+    setLoading(true)
+
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -50,6 +56,7 @@ const AlertsPage = () => {
         }
       })
       .then(response => {
+        setLoading(false)
         setData(response.data.data)
       })
       .catch(error => {
@@ -57,7 +64,7 @@ const AlertsPage = () => {
       })
   }, [message])
 
-  return (
+  return loading == false ?  (
     <ApexChartWrapper>
       <KeenSliderWrapper>
         <Grid container spacing={6}>
@@ -69,7 +76,7 @@ const AlertsPage = () => {
         </Grid>
       </KeenSliderWrapper>
     </ApexChartWrapper>
-  )
+  ) : <Loaders/>
 }
 
 export default AlertsPage

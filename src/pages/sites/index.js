@@ -10,13 +10,36 @@ import authConfig from 'src/configs/auth'
 
 import { useEffect, useState } from 'react'
 
+import { useRouter } from 'next/router'
+
 //Component
 import SiteTable from 'src/views/sites/siteTable'
 import FormLayoutsEditSite from 'src/views/sites/edit-form/sitesEditForm'
 import DialogConfirmationDelete from 'src/views/delete-confirmation/deleteConfirmation'
 import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
+import Loaders from 'src/views/loaders/loaders'
 
 const SitePage = () => {
+  const [fetchData, setFetchData] = useState(false)
+  //loading state
+  const [loading, setLoading] = useState(false)
+  //message state
+  const [message, setMessage] = useState('')
+
+  //check success add data
+  const router = useRouter()
+  const { add_success } = router.query
+ 
+  useEffect(() => {
+    if (add_success){
+      setError(false)
+      setOpenSnackbarAlert(true)
+      setMessage('data berhasil ditambahkan')
+    }else{
+      console.log(add_success)
+    }
+  }, [])
+
   //check permission
   const [userDataPermission, setUserDataPermission] = useState('')
   useEffect(() => {
@@ -29,11 +52,11 @@ const SitePage = () => {
         }
       })
       .then(response => {
-        const userPermission = response.data.user_permissions
+        const userPermission = response.data.role.role_permissions
         const filteredPermission = Object.keys(userPermission).filter(keys => {
           return userPermission[keys].name == 'Site'
         })
-        setUserDataPermission(userPermission[filteredPermission].pivot.user_permission)
+        setUserDataPermission(userPermission[filteredPermission].pivot.role_permission)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
@@ -41,10 +64,10 @@ const SitePage = () => {
   }, [])
 
   //fetch data
-  const [message, setMessage] = useState('')
   //sites data
   const [dataSites, setDataSites] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -54,15 +77,18 @@ const SitePage = () => {
         }
       })
       .then(response => {
+        setLoading(false)
+
         setDataSites(response.data.data)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
+  }, [fetchData])
   // Customers data
   const [dataCustomers, setDataCustomers] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -72,14 +98,15 @@ const SitePage = () => {
         }
       })
       .then(response => {
+        setLoading(false)
+
         setDataCustomers(response.data.data)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
-  console.log(dataSites)
-  console.log(dataCustomers)
+  }, [fetchData])
+
 
   //take data from selected row
   const [selectedData, setSelectedData] = useState({
@@ -103,6 +130,7 @@ const SitePage = () => {
 
   //delete data
   const handleDelete = () => {
+    setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     if (!selectedData.site_id) {
@@ -120,6 +148,7 @@ const SitePage = () => {
         }
       )
       .then(response => {
+        setFetchData(false)
         setMessage(`Data with ID  deleted successfully.`)
         handleCloseDeleteConfirmation()
         setOpenSnackbarAlert(true)
@@ -133,6 +162,7 @@ const SitePage = () => {
 
   //edit data
   const handleEdit = () => {
+    setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     console.log(selectedData)
@@ -143,6 +173,7 @@ const SitePage = () => {
         }
       })
       .then(response => {
+        setFetchData(false)
         handleCloseEditDialog()
         handleSuccess(response)
       })
@@ -190,7 +221,7 @@ const SitePage = () => {
     setMessage(response.data.message)
   }
 
-  return (
+  return loading == false ? (
     <>
       <ApexChartWrapper>
         <KeenSliderWrapper>
@@ -216,7 +247,7 @@ const SitePage = () => {
       />
       <SnackbarAlert open={openSnackbarAlert} message={message} error={error} handleClose={handleSnackbarAlertClose} />
     </>
-  )
+  ) : <Loaders/>
 }
 
 export default SitePage

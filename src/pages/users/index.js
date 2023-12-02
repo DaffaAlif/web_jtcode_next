@@ -10,13 +10,37 @@ import authConfig from 'src/configs/auth'
 
 import { useEffect, useState } from 'react'
 
+import { useRouter } from 'next/router'
+
 //Component
 import UserTable from 'src/views/users/userTable'
 import FormLayoutsEditUser from 'src/views/users/edit-form/userEditForm'
 import DialogConfirmationDelete from 'src/views/delete-confirmation/deleteConfirmation'
 import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
+import Loaders from 'src/views/loaders/loaders'
+
 
 const ClientPage = () => {
+  //loading state
+  const [loading, setLoading] = useState(false)
+  //message state
+  const [message, setMessage] = useState('')
+
+  //check success add data
+  const router = useRouter()
+  const { add_success } = router.query
+ 
+  useEffect(() => {
+    console.log(add_success)
+    if (add_success){
+      setError(false)
+      setOpenSnackbarAlert(true)
+      setMessage('data berhasil ditambahkan')
+    }else{
+      console.log(add_success)
+    }
+  }, [])
+
   //check permission
   const [userDataPermission, setUserDataPermission] = useState('')
   useEffect(() => {
@@ -29,11 +53,11 @@ const ClientPage = () => {
         }
       })
       .then(response => {
-        const userPermission = response.data.user_permissions
+        const userPermission = response.data.role.role_permissions
         const filteredPermission = Object.keys(userPermission).filter(keys => {
           return userPermission[keys].name == 'Site'
         })
-        setUserDataPermission(userPermission[filteredPermission].pivot.user_permission)
+        setUserDataPermission(userPermission[filteredPermission].pivot.role_permission)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
@@ -41,9 +65,9 @@ const ClientPage = () => {
   }, [])
 
   //fetch data
-  const [message, setMessage] = useState('')
   const [data, setData] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -53,6 +77,7 @@ const ClientPage = () => {
         }
       })
       .then(response => {
+        setLoading(false)
         setData(response.data.data)
       })
       .catch(error => {
@@ -61,6 +86,7 @@ const ClientPage = () => {
   }, [message])
   const [dataClients, setDataClients] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -70,6 +96,7 @@ const ClientPage = () => {
         }
       })
       .then(response => {
+        setLoading(false)
         setDataClients(response.data.data)
       })
       .catch(error => {
@@ -79,6 +106,7 @@ const ClientPage = () => {
   //customers data
   const [dataCustomers, setDataCustomers] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -88,6 +116,7 @@ const ClientPage = () => {
         }
       })
       .then(response => {
+        setLoading(false)
         setDataCustomers(response.data.data)
       })
       .catch(error => {
@@ -200,7 +229,7 @@ const ClientPage = () => {
     setMessage(response.data.message)
   }
 
-  return (
+  return loading == false ? (
     <>
       <ApexChartWrapper>
         <KeenSliderWrapper>
@@ -227,7 +256,7 @@ const ClientPage = () => {
       />
       <SnackbarAlert open={openSnackbarAlert} message={message} handleClose={handleSnackbarAlertClose} error={error} />
     </>
-  )
+  ) : <Loaders/>
 }
 
 export default ClientPage

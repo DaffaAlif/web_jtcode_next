@@ -97,7 +97,7 @@ const FormLayoutsIcons = () => {
       })
       .then(response => {
         handleSuccess(response)
-        router.push('/alarmset')
+        router.push('/alarmset?add_success=true')
       })
       .catch(error => {
         handleError(error.response.data.errors)

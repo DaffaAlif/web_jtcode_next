@@ -15,8 +15,11 @@ import UserGroupTable from 'src/views/user-group/userGroupTable'
 import FormLayoutsEditUserGroup from 'src/views/user-group/edit-form/userGroupEditForm'
 import DialogConfirmationDelete from 'src/views/delete-confirmation/deleteConfirmation'
 import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
+import Loaders from 'src/views/loaders/loaders'
 
 const UserGroupPage = () => {
+  const [loading, setLoading] = useState(false)
+  const [fetchData, setFetchData] = useState(false)
   //check permission
   const [userDataPermission, setUserDataPermission] = useState('')
   useEffect(() => {
@@ -29,11 +32,11 @@ const UserGroupPage = () => {
         }
       })
       .then(response => {
-        const userPermission = response.data.user_permissions
+        const userPermission = response.data.role.role_permissions
         const filteredPermission = Object.keys(userPermission).filter(keys => {
           return userPermission[keys].name == 'Site'
         })
-        setUserDataPermission(userPermission[filteredPermission].pivot.user_permission)
+        setUserDataPermission(userPermission[filteredPermission].pivot.role_permission)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
@@ -44,36 +47,39 @@ const UserGroupPage = () => {
   const [message, setMessage] = useState('')
   const [data, setData] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
-      .get('https://dev.iotaroundyou.my.id/api/clients', {
+      .get('https://dev.iotaroundyou.my.id/api/clients?permission=true', {
         headers: {
           Authorization: 'Bearer ' + storedToken
         }
       })
       .then(response => {
+        setLoading(false)
         setData(response.data.data)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
-  }, [message])
-  console.log(data)
+  }, [fetchData])
+ 
+
 
   //take data from selected row
-  const [selectedData, setSelectedData] = useState({
-    role_id: 'selectedData.role_id',
-    code: 'selectedData.code',
-    name: 'selectedData.name',
-    address: 'selectedData.address',
-    status: 'selectedData.status',
-    notes: 'selectedData.notes'
-  })
+  const [selectedData, setSelectedData] = useState(['----', '----', '----', '----', '----', '----'])
+  const [selectedDataRow, setSelectedDataRow] = useState([])
   const handleSelectedData = (row, edit = false, del = false) => {
-    setSelectedData(row)
+    setSelectedDataRow(row)
+    const initialValues = row.role_permissions.map(row => {
+      return row.pivot.role_permission || '----';
+    });
+    setSelectedData(initialValues);
     if (edit) {
-      handleClickOpenEditDialog()
+      if (selectedData) {
+        handleClickOpenEditDialog()
+      }  
     }
     if (del) {
       handleClickDeleteConfirmation()
@@ -84,14 +90,14 @@ const UserGroupPage = () => {
   const handleDelete = () => {
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
-    if (!selectedData.role_id) {
+    if (!selectedDataRow.role_id) {
       setMessage('Please enter an ID to delete.')
       return
     }
     axios
       .post(
         `https://dev.iotaroundyou.my.id/api/role/delete`,
-        { role_id: selectedData.role_id },
+        { role_id: selectedDataRow.role_id },
         {
           headers: {
             Authorization: 'Bearer ' + storedToken
@@ -101,6 +107,7 @@ const UserGroupPage = () => {
       .then(response => {
         setMessage(`Data with ID  deleted successfully.`)
         handleCloseDeleteConfirmation()
+        setFetchData(true)
         setOpenSnackbarAlert(true)
         setMessage(response.data.message)
       })
@@ -111,17 +118,20 @@ const UserGroupPage = () => {
   }
 
   //edit data
+  const [finalValue, setFinalValue] = useState({})
   const handleEdit = () => {
+    setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     console.log(selectedData)
     axios
-      .post(`https://dev.iotaroundyou.my.id/api/role/update`, selectedData, {
+      .post(`https://dev.iotaroundyou.my.id/api/role/permission`, finalValue, {
         headers: {
           Authorization: 'Bearer ' + storedToken
         }
       })
       .then(response => {
+        setFetchData(false)
         handleCloseEditDialog()
         handleSuccess(response)
       })
@@ -129,10 +139,31 @@ const UserGroupPage = () => {
         handleError(error.response.data.errors)
       })
   }
-  const handleEditFormChange = e => {
-    const { name, value } = e.target
-    setSelectedData({ ...selectedData, [name]: value })
-  }
+  const handleCheckboxChange = (rowIndex, column) => {
+    const updatedValues = [...selectedData];
+    updatedValues[rowIndex] = updatedValues[rowIndex].split('');
+    if(column == 0 ){
+      updatedValues[rowIndex][column] = updatedValues[rowIndex][column] === '-' ? 'v' : '-';
+    }else if( column == 1){
+      updatedValues[rowIndex][column] = updatedValues[rowIndex][column] === '-' ? 'a' : '-';
+    }
+    else if( column == 2){
+      updatedValues[rowIndex][column] = updatedValues[rowIndex][column] === '-' ? 'e' : '-';
+    }
+    else if( column == 3){
+      updatedValues[rowIndex][column] = updatedValues[rowIndex][column] === '-' ? 'd' : '-';
+    }
+    updatedValues[rowIndex] = updatedValues[rowIndex].join('');
+    const newValue = updatedValues.map((updatedValues, index) => {
+      return {
+        user_group_id : selectedDataRow.role_permissions[index].user_group_id,
+        role_permission : updatedValues
+      }})
+    setSelectedData(updatedValues);
+    setFinalValue({
+      role_id : selectedDataRow.role_id,
+      role_permissions : newValue})
+  };
 
   //dialogBox
   const [openEditDialog, setOpenEditDialog] = useState(false)
@@ -165,10 +196,10 @@ const UserGroupPage = () => {
   const handleSuccess = response => {
     setError(false)
     setOpenSnackbarAlert(true)
-    setMessage(response.data.message)
+    setMessage(response.data.data)
   }
 
-  return (
+  return loading == false ?  (
     <>
       <ApexChartWrapper>
         <KeenSliderWrapper>
@@ -183,7 +214,8 @@ const UserGroupPage = () => {
         open={openEditDialog}
         handleClose={handleCloseEditDialog}
         selectedData={selectedData}
-        handleFormChange={handleEditFormChange}
+        selectedDataRow={selectedDataRow}
+        handleCheckboxChange={handleCheckboxChange}
         handleEdit={handleEdit}
       />
       <DialogConfirmationDelete
@@ -193,7 +225,7 @@ const UserGroupPage = () => {
       />
       <SnackbarAlert open={openSnackbarAlert} message={message} handleClose={handleSnackbarAlertClose} error={error} />
     </>
-  )
+  ) : <Loaders/>
 }
 
 export default UserGroupPage

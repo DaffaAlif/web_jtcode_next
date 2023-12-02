@@ -10,13 +10,37 @@ import authConfig from 'src/configs/auth'
 
 import { useEffect, useState } from 'react'
 
+import { useRouter } from 'next/router'
+
 //Component
 import CustomerTable from 'src/views/customers/customerTable'
 import FormLayoutsEditCustomer from 'src/views/customers/edit-form/customerEditForm'
 import DialogConfirmationDelete from 'src/views/delete-confirmation/deleteConfirmation'
 import SnackbarAlert from 'src/views/snackbar/snackbarAlert'
+import Loaders from 'src/views/loaders/loaders'
 
 const CustomerPage = () => {
+  const [fetchData, setFetchData] = useState(false)
+  //loading state
+  const [loading, setLoading] = useState(false)
+  //message state
+  const [message, setMessage] = useState('')
+
+   //check success add data
+  const router = useRouter()
+  const { add_success } = router.query
+  
+  useEffect(() => {
+     console.log(add_success)
+     if (add_success){
+       setError(false)
+       setOpenSnackbarAlert(true)
+       setMessage('data berhasil ditambahkan')
+     }else{
+       console.log(add_success)
+     }
+   }, [])
+
   //check permission
   const [userDataPermission, setUserDataPermission] = useState('')
   useEffect(() => {
@@ -31,7 +55,7 @@ const CustomerPage = () => {
       .then(response => {
         const userPermission = response.data.user_permissions
         const filteredPermission = Object.keys(userPermission).filter(keys => {
-          return userPermission[keys].name == 'Client'
+          return userPermission[keys].name == 'Printer'
         })
         setUserDataPermission(userPermission[filteredPermission].pivot.user_permission)
       })
@@ -40,11 +64,10 @@ const CustomerPage = () => {
       })
   }, [])
 
-  //fetch data
-  const [message, setMessage] = useState('')
   //customers data
   const [dataCustomers, setDataCustomers] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -54,6 +77,7 @@ const CustomerPage = () => {
         }
       })
       .then(response => {
+        setLoading(false)
         setDataCustomers(response.data.data)
       })
       .catch(error => {
@@ -63,6 +87,7 @@ const CustomerPage = () => {
   // clients data
   const [dataClients, setDataClients] = useState([])
   useEffect(() => {
+    setLoading(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
@@ -72,14 +97,15 @@ const CustomerPage = () => {
         }
       })
       .then(response => {
+        
         setDataClients(response.data.data)
+        setLoading(false)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
   }, [message])
-  console.log(dataCustomers)
-  console.log(dataClients)
+
 
   //take data from selected row
   const [selectedData, setSelectedData] = useState({
@@ -190,7 +216,7 @@ const CustomerPage = () => {
     setMessage(response.data.message)
   }
 
-  return (
+  return loading == false ?  (
     <>
       <ApexChartWrapper>
         <KeenSliderWrapper>
@@ -220,7 +246,7 @@ const CustomerPage = () => {
       />
       <SnackbarAlert open={openSnackbarAlert} message={message} error={error} handleClose={handleSnackbarAlertClose} />
     </>
-  )
+  ) : <Loaders/>
 }
 
 export default CustomerPage

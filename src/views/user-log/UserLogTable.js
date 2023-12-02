@@ -105,7 +105,7 @@ const UserLogTable = ({ permission, tableData, selectData }) => {
         getRowId={getRowId}
         autoHeight
         pagination
-        rows={tableData}
+        rows={tableData.data}
         rowHeight={62}
         columns={columns}
         // checkboxSelection

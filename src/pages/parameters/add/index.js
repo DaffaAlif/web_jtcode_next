@@ -80,7 +80,7 @@ const FormLayoutsIcons = () => {
       })
       .then(response => {
         handleSuccess(response)
-        router.push('/parameters')
+        router.push('/parameters?add_success=true')
       })
       .catch(error => {
         handleError(error.response.data.errors)

@@ -19,6 +19,7 @@ import UnprintedProducts from 'src/views/alerts/unprintedProducts'
 import OEECompared from 'src/views/alerts/oeeCompared'
 import DowntimeDifference from 'src/views/alerts/downtimeDifference'
 import AlertTable from 'src/views/alerts/alertTable'
+import Loaders from 'src/views/loaders/loaders'
 
 
 const AlertsPage = () => {
@@ -36,7 +37,7 @@ const AlertsPage = () => {
       .then(response => {
         const userPermission = response.data.user_permissions
         const filteredPermission = Object.keys(userPermission).filter(keys => {
-          return userPermission[keys].name == 'Site'
+          return userPermission[keys].name == 'Printer'
         })
         setUserDataPermission(userPermission[filteredPermission].pivot.user_permission)
       })

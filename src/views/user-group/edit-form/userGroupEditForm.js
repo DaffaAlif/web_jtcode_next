@@ -22,36 +22,10 @@ import TableContainer from '@mui/material/TableContainer'
 
 // Form CheckBox
 import Checkbox from '@mui/material/Checkbox'
-import FormGroup from '@mui/material/FormGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 
-const createData = (page, view, add, edit, del) => {
-  return { page, view, add, edit, del }
-}
+const FormLayoutsEditUserGroup = ({ handleClose, open, selectedData, selectedDataRow, handleCheckboxChange, handleEdit }) => {
 
-const rows = [
-  createData('Clients', false, false, false, false),
-  createData('Customers', false, false, false, false),
-  createData('Sites', false, false, false, false),
-  createData('Printers', false, false, false, false),
-  createData('Alarmset', false, false, false, false),
-  createData('Instruments', false, false, false, false),
-  createData('Parameters', false, false, false, false),
-  createData('Users', false, false, false, false),
-  createData('User Group', false, false, false, false)
-]
-
-
-// ** Custom Component Import
-import CustomTextField from 'src/@core/components/mui/text-field'
-
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
-
-const FormLayoutsEditUserGroup
-  = ({ handleClose, open, selectedData, handleFormChange, handleEdit }) => {
-    console.log(selectedData)
-    console.log(rows)
   return (
     <>
       <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
@@ -66,7 +40,7 @@ const FormLayoutsEditUserGroup
             >
               <Grid container spacing={5}>
                 <Grid item xs={12}>
-                  <TableContainer component={Paper} sx={{ maxWidth: '100%' }}>
+                  <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 650 }} aria-label='simple table'>
                       <TableHead>
                         <TableRow>
@@ -78,9 +52,9 @@ const FormLayoutsEditUserGroup
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {rows.map(row => (
+                        {selectedDataRow.role_permissions?.map((row, rowIndex) => (
                           <TableRow
-                            key={row.page}
+                            key={row.name}
                             sx={{
                               '&:last-of-type td, &:last-of-type th': {
                                 border: 0
@@ -88,20 +62,20 @@ const FormLayoutsEditUserGroup
                             }}
                           >
                             <TableCell component='th' scope='row'>
-                              {row.page}
+                              {row.name}
                             </TableCell>
-                            <TableCell align='center'>
-                              <FormControlLabel control={<Checkbox checked={row.view} />} />
+                            {[0, 1, 2, 3].map((column, columnIndex) => (
+                            <TableCell align='center' key={columnIndex}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={selectedData[rowIndex][column] !== '-'}
+                                    onChange={() => handleCheckboxChange(rowIndex, column, row)}
+                                  />
+                                }
+                              />
                             </TableCell>
-                            <TableCell align='center'>
-                              <FormControlLabel control={<Checkbox checked={row.add} />} />
-                            </TableCell>
-                            <TableCell align='center'>
-                              <FormControlLabel control={<Checkbox checked={row.edit} />} />
-                            </TableCell>
-                            <TableCell align='center'>
-                              <FormControlLabel control={<Checkbox checked={row.delete} />} />
-                            </TableCell>
+                          ))}
                           </TableRow>
                         ))}
                       </TableBody>
