@@ -51,7 +51,7 @@ const UserGroupPage = () => {
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
-      .get('https://dev.iotaroundyou.my.id/api/clients?permission=true', {
+      .get('https://dev.iotaroundyou.my.id/api/children', {
         headers: {
           Authorization: 'Bearer ' + storedToken
         }
@@ -68,23 +68,38 @@ const UserGroupPage = () => {
 
 
   //take data from selected row
-  const [selectedData, setSelectedData] = useState(['----', '----', '----', '----', '----', '----'])
-  const [selectedDataRow, setSelectedDataRow] = useState([])
-  const handleSelectedData = (row, edit = false, del = false) => {
-    setSelectedDataRow(row)
-    const initialValues = row.role_permissions.map(row => {
-      return row.pivot.role_permission || '----';
-    });
-    setSelectedData(initialValues);
-    if (edit) {
-      if (selectedData) {
-        handleClickOpenEditDialog()
-      }  
+  const [selectedData, setSelectedData] = useState(['----', '----', '----', '----', '----', '----']);
+  const [selectedDataRow, setSelectedDataRow] = useState([]);
+
+const handleSelectedData = async (row, edit = false, del = false) => {
+  try {
+    const cookies = new Cookies();
+    const storedToken = cookies.get(authConfig.storageTokenKeyName);
+
+    const response = await axios.post(
+      'https://dev.iotaroundyou.my.id/api/permission',
+      { role_id: row.role_id },
+      {
+        headers: {
+          Authorization: 'Bearer ' + storedToken
+        }
+      }
+    );
+    const initialValues = response.data.data.role_permissions.map(row => row.pivot.role_permission || '----');
+    setSelectedDataRow(response.data.data);
+    setSelectedData(initialValues)
+    if (edit && initialValues.length > 0) {
+      console.log(initialValues);
+      handleClickOpenEditDialog();
     }
     if (del) {
-      handleClickDeleteConfirmation()
+      handleClickDeleteConfirmation();
     }
+  } catch (error) {
+    console.error('Error handling selected data:', error);
   }
+};
+
 
   //delete data
   const handleDelete = () => {
@@ -123,7 +138,6 @@ const UserGroupPage = () => {
     setFetchData(true)
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
-    console.log(selectedData)
     axios
       .post(`https://dev.iotaroundyou.my.id/api/role/permission`, finalValue, {
         headers: {

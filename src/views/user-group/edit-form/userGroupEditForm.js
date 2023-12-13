@@ -25,7 +25,7 @@ import Checkbox from '@mui/material/Checkbox'
 import FormControlLabel from '@mui/material/FormControlLabel'
 
 const FormLayoutsEditUserGroup = ({ handleClose, open, selectedData, selectedDataRow, handleCheckboxChange, handleEdit }) => {
-
+  console.log(selectedData)
   return (
     <>
       <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
