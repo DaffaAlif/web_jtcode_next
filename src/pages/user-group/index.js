@@ -150,7 +150,8 @@ const handleSelectedData = async (row, edit = false, del = false) => {
         handleSuccess(response)
       })
       .catch(error => {
-        handleError(error.response.data.errors)
+        console.log(error.response.data.message)
+        handleError(error.response.data.message)
       })
   }
   const handleCheckboxChange = (rowIndex, column) => {
@@ -206,6 +207,7 @@ const handleSelectedData = async (row, edit = false, del = false) => {
     setError(true)
     const allErrors = error.join('\n')
     setMessage(allErrors)
+    handleCloseEditDialog()
   }
   const handleSuccess = response => {
     setError(false)
