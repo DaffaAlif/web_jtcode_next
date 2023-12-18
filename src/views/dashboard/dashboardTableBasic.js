@@ -5,6 +5,8 @@ import CardHeader from '@mui/material/CardHeader'
 import { DataGrid } from '@mui/x-data-grid'
 import { Button } from '@mui/material'
 
+import { useRouter } from 'next/router'
+
 // ** Data Import
 import { rows } from 'src/@fake-db/table/static-data'
 
@@ -24,11 +26,13 @@ const columns = [
 ]
 
 const DashboardTableBasic = () => {
+  const router = useRouter()
+
   return (
     <Card sx={{ maxHeight: 400 }}>
       <CardHeader title='Printers' />
       <Box align='right' sx={{ p: 3 }}>
-        <Button variant='contained'>Edit</Button>
+        <Button onClick={() => router.push('/printers')} variant='contained'>Edit</Button>
       </Box>
       <Box sx={{ height: 500 }}>
         <DataGrid columns={columns} rows={rows.slice(0, 10)} />
