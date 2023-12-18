@@ -134,7 +134,7 @@ const UserLayout = ({ children, contentHeightFixed }) => {
         }
       })}
       footerProps={{
-        content: () => 'I am footer which is overridden by the user'
+        content: () => 'Developed by daffalif02@gmail.com and muaz.abdlr@gmail.com'
       }}
     >
       {children}

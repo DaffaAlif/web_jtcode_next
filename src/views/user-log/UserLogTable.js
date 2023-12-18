@@ -18,9 +18,9 @@ import { useRouter } from 'next/router'
 // ** Custom Components
 import Icon from 'src/@core/components/icon'
 
-const UserLogTable = ({ permission, tableData, selectData }) => {
+const UserLogTable = ({ tableData }) => {
   console.log(tableData)
-  console.log(permission)
+
   // ** States
   const router = useRouter()
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 7 })
@@ -105,7 +105,7 @@ const UserLogTable = ({ permission, tableData, selectData }) => {
         getRowId={getRowId}
         autoHeight
         pagination
-        rows={tableData.data}
+        rows={tableData}
         rowHeight={62}
         columns={columns}
         // checkboxSelection

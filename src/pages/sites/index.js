@@ -53,6 +53,7 @@ const SitePage = () => {
       })
       .then(response => {
         const userPermission = response.data.role.role_permissions
+        console.log(response.data)
         const filteredPermission = Object.keys(userPermission).filter(keys => {
           return userPermission[keys].name == 'Site'
         })

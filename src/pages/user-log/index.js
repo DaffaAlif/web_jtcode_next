@@ -19,28 +19,6 @@ const AlertsPage = () => {
   //loading state
   const [loading, setLoading] = useState(false)
 
-  const [userDataPermission, setUserDataPermission] = useState('')
-  useEffect(() => {
-    const cookies = new Cookies()
-    const storedToken = cookies.get(authConfig.storageTokenKeyName)
-    axios
-      .get('https://dev.iotaroundyou.my.id/api/user', {
-        headers: {
-          Authorization: 'Bearer ' + storedToken
-        }
-      })
-      .then(response => {
-        const userPermission = response.data.user_permissions
-        const filteredPermission = Object.keys(userPermission).filter(keys => {
-          return userPermission[keys].name == 'Site'
-        })
-        setUserDataPermission(userPermission[filteredPermission].pivot.user_permission)
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error)
-      })
-  }, [])
-
   //fetch data
   const [message, setMessage] = useState('')
   const [data, setData] = useState([])
@@ -57,12 +35,14 @@ const AlertsPage = () => {
       })
       .then(response => {
         setLoading(false)
-        setData(response.data.data)
+        setData(response.data.data.data)
       })
       .catch(error => {
         console.error('Error fetching data:', error)
       })
   }, [message])
+
+  console.log(data)
 
   return loading == false ?  (
     <ApexChartWrapper>
@@ -70,7 +50,7 @@ const AlertsPage = () => {
         <Grid container spacing={6}>
           <Grid item xs={12} lg={12}>
             <UserLogTable 
-              permission={userDataPermission} tableData={data}
+               tableData={data}
             />
           </Grid>
         </Grid>
