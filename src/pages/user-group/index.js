@@ -51,7 +51,7 @@ const UserGroupPage = () => {
     const cookies = new Cookies()
     const storedToken = cookies.get(authConfig.storageTokenKeyName)
     axios
-      .get('https://dev.iotaroundyou.my.id/api/children', {
+      .get('https://dev.iotaroundyou.my.id/api/children?take=30&page=1', {
         headers: {
           Authorization: 'Bearer ' + storedToken
         }
