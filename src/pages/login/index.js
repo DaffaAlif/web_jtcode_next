@@ -188,17 +188,18 @@ const LoginPage = () => {
               <Typography variant='h3' sx={{ mb: 1.5 }}>
                 {`Welcome to ${themeConfig.templateName}! 👋🏻`}
               </Typography>
-              <Typography sx={{ color: 'text.secondary' }}>
-                Please sign-in to your account and start the adventure
-              </Typography>
+              
             </Box>
             <Alert icon={false} sx={{ py: 3, mb: 6, ...bgColors.primaryLight, '& .MuiAlert-message': { p: 0 } }}>
+              <Typography sx={{ color: 'text.secondary' }}>
+                Do not have an account? No worries use this demo account! 
+              </Typography>
               <Typography variant='body2' sx={{ mb: 2, color: 'primary.main' }}>
-                Admin: <strong>admin@vuexy.com</strong> / Pass: <strong>admin</strong>
+                Email: <strong>demojtcode@email.com</strong> / Pass: <strong>demojtcode</strong>
               </Typography>
-              <Typography variant='body2' sx={{ color: 'primary.main' }}>
+              {/* <Typography variant='body2' sx={{ color: 'primary.main' }}>
                 Client: <strong>client@vuexy.com</strong> / Pass: <strong>client</strong>
-              </Typography>
+              </Typography> */}
             </Alert>
             <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ mb: 4 }}>
@@ -254,7 +255,7 @@ const LoginPage = () => {
                   )}
                 />
               </Box>
-              <Box
+              {/* <Box
                 sx={{
                   mb: 1.75,
                   display: 'flex',
@@ -270,17 +271,17 @@ const LoginPage = () => {
                 <Typography component={LinkStyled} href='/forgot-password'>
                   Forgot Password?
                 </Typography>
-              </Box>
-              <Button fullWidth type='submit' variant='contained' sx={{ mb: 4 }}>
+              </Box> */}
+              <Button fullWidth type='submit' variant='contained' sx={{ mb: 4, mt:4 }}>
                 Login
               </Button>
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+              {/* <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <Typography sx={{ color: 'text.secondary', mr: 2 }}>New on our platform?</Typography>
                 <Typography href='/register' component={LinkStyled}>
                   Create an account
                 </Typography>
-              </Box>
-              <Divider
+              </Box> */}
+              {/* <Divider
                 sx={{
                   color: 'text.disabled',
                   '& .MuiDivider-wrapper': { px: 6 },
@@ -308,7 +309,7 @@ const LoginPage = () => {
                 <IconButton href='/' component={Link} sx={{ color: '#db4437' }} onClick={e => e.preventDefault()}>
                   <Icon icon='mdi:google' />
                 </IconButton>
-              </Box>
+              </Box> */}
             </form>
           </Box>
         </Box>
